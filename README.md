@@ -1,2 +1,3 @@
-# AdaptiveImmuinity_and_Clearance
-Data and results interrogating the role of adaptive immunity in clearing C. difficile infection. 
+Leslie_clearance_2017
+
+working on descritpion...
