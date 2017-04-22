@@ -112,7 +112,7 @@ rm(metadata)
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
 cleared_colonized <- subset(shared, Colonization630 != 'uncolonized')
-# subset by days
+cleared_colonized <- subset(cleared_colonized, Day %in% c(-15,-12,1)) # needs work...
 
 cleared_colonized$Co_Housed <- NULL
 cleared_colonized$Day <- NULL
