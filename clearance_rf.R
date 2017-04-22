@@ -49,9 +49,9 @@ random_Forest <- function(training_data, feat){
 }
 
 # Define data files
-metadata <- '~/Desktop/Repositories/Leslie_clearance_2017/Adaptiveimmuneclear_metadata_noD40.42.txt'
-shared <- '~/Desktop/Repositories/Leslie_clearance_2017/CDIclear.final.shared'
-taxonomy <- '~/Desktop/Repositories/Leslie_clearance_2017/CDIclear.final.0.03.cons.taxonomy'
+metadata <- '~/Desktop/Repositories/clearance_2017/Adaptiveimmuneclear_metadata_noD40.42.txt'
+shared <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.shared'
+taxonomy <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.0.03.cons.taxonomy'
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -60,42 +60,62 @@ metadata$Cage <- NULL
 metadata$Gender <- NULL
 metadata$Genotype <- NULL
 metadata$Year <- NULL
+metadata$Treatment_Grp <- NULL
+metadata$Treatment_1 <- NULL
 shared <- read.delim(shared, sep='\t', header=T, row.names=2)
 shared$numOtus <- NULL
 shared$label <- NULL
 taxonomy <- read.delim(taxonomy, sep='\t', header=T, row.names=1)
 taxonomy$Size <- NULL
 
-# Plot abundances to pick a subsample size
-plot(sort(rowSums(shared)), xlab='sample', ylab='abundance')
-abline(h=4000, lty=4, col='red') # Show the cutoff
+#--------------------------------------------------------------------#
 
+# Decide on optimal subsample level
+sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
+
+# Plot abundances to pick a subsample size
+pdf(file='~/Desktop/Repositories/clearance_2017/subsample_plot.pdf', width=8, height=4)
+layout(matrix(c(1,2), nrow=1, ncol=2, byrow=TRUE))
+par(mar=c(3,3,1,1), mgp=c(2,1,0))
+plot(sort(rowSums(shared)), pch=20, xlab='Sample', ylab='Abundance')
+abline(h=sub_size, lty=4, col='red', lwd=2) # Show the cutoff
+text(x=200, y=85000, 'Subsample Size:', cex=0.8)
+text(x=200, y=80000, sub_size)
+mtext('A', side=2, line=2, las=2, adj=1, padj=-8, cex=1.5)
+
+# Rarefaction for random sample to test size
+rarecurve(shared[736,], sample=sub_size)
+mtext('B', side=2, line=2, las=2, adj=1, padj=-8, cex=1.5)
+dev.off()
+
+#--------------------------------------------------------------------#
+
+# Format data
 # Rarefy and filter shared file
 shared <- as.data.frame(t(shared))
-shared <- shared[, colSums(shared) > 4000] # Loses 72 samples
-sub_size <- round(min(colSums(shared)) * 0.9) # subsampling level
+shared <- shared[, colSums(shared) > sub_size] # Loses 7% samples
 for (index in 1:ncol(shared)){
   shared[,index] <- t(rrarefy(shared[,index], sample=sub_size))}
-rm(index, sub_size)
+rm(index)
 shared <- as.data.frame(t(shared))
-shared <- filter_table(shared) # Loses 5412 OTUs
+shared <- filter_table(shared) # Loses 5007 OTUs
+
+# Subset taxonomy to remaining OTUs
+taxonomy <- subset (taxonomy, rownames(taxonomy) %in% colnames(shared))
 
 # Merge datasets
-shared <- merge(metadata, shared, by='row.names') # Drops 339 samples
+shared <- merge(metadata, shared, by='row.names', all.x=FALSE, all.y=FALSE) # Drops 339 samples
 rownames(shared) <- shared$Row.names
 shared$Row.names <- NULL
 rm(metadata)
 
-#--------------------------------------------------------------------#
-
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
 cleared_colonized <- subset(shared, Colonization630 != 'uncolonized')
-# further subsetting?
-cleared_colonized$Day <- NULL
+# subset by days
+
 cleared_colonized$Co_Housed <- NULL
-cleared_colonized$Treatment_Grp <- NULL
-cleared_colonized$Treatment_1 <- NULL
+cleared_colonized$Day <- NULL
 cleared_colonized$Treatment_2 <- NULL
 
 # Adoptive transfer
@@ -103,9 +123,7 @@ adoptive_transfer <- subset(shared, Treatment_2 %in% c('infected_splenocytes','m
 # further subsetting?
 adoptive_transfer$Day <- NULL
 adoptive_transfer$Co_Housed <- NULL
-adoptive_transfer$Treatment_Grp <- NULL
 adoptive_transfer$Colonization630 <- NULL
-adoptive_transfer$Treatment_1 <- NULL
 
 # What outcome based on co-housing is of interest?
 cohousing <- subset(shared, Colonization630 != 'uncolonized')

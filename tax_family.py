@@ -23,6 +23,7 @@ with open(sys.argv[1], 'r') as tax:
 		
 		phylum = taxon[1]
 		family = taxon[4]
+		genus = taxon[5] # generate a second file for this level
 
 		outfile.write('\t'.join([otu, phylum, family + '\n']))
 
