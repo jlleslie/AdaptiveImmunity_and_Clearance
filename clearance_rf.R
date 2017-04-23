@@ -5,13 +5,14 @@ gc()
 set.seed(8619)
 
 # Load dependencies
-deps <- c('randomForest', 'vegan', 'gtools');
+deps <- c('randomForest', 'vegan');
 for (dep in deps){
   if (dep %in% installed.packages()[,'Package'] == FALSE){
     install.packages(as.character(dep), quiet=TRUE);
   }
   library(dep, verbose=FALSE, character.only=TRUE)
 }
+rm(dep)
 
 # Filter out columns that have values in at least 3 samples (ignores first column if needed)
 filter_table <- function(data) {
@@ -30,28 +31,10 @@ filter_table <- function(data) {
   return(filtered_data)
 }
 
-random_Forest <- function(training_data, feat){
-
-  attach(training_data)
-  # ntree and mtry calculations from Segal et al. (2004)
-  num1 <- round(length(as.character(rownames(data[which(training_data[,feat]==as.vector(levels(training_data[,feat]))[1]),]))* 0.623))
-  num2 <- round(length(as.character(rownames(data[which(training_data[,feat]==as.vector(levels(training_data[,feat]))[2]),]))* 0.623))
-  rf_factor <- max(c(round(num1/num2), round(num2/num2))) * 3 
-  trees <- round(length(colnames(training_data)) - 1) * rf_factor
-  tries <- round(sqrt(length(colnames(training_data)) - 1))
-  
-  # Run random forest
-  rf_object <- randomForest(training_data[,feat]~., data=training_data, importance=TRUE, replace=FALSE, do.trace=500, err.rate=TRUE, ntree=trees, mtry=tries)
-  
-  rm(num1, num2, rf_factor, trees, tries)
-  detach(training_data)
-  return(rf_object)
-}
-
 # Define data files
 metadata <- '~/Desktop/Repositories/clearance_2017/Adaptiveimmuneclear_metadata_noD40.42.txt'
 shared <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.shared'
-taxonomy <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.0.03.cons.taxonomy'
+taxonomy <- '~/Desktop/Repositories/clearance_2017/clearance.formatted.taxonomy'
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -101,7 +84,7 @@ shared <- as.data.frame(t(shared))
 shared <- filter_table(shared) # Loses 5007 OTUs
 
 # Subset taxonomy to remaining OTUs
-taxonomy <- subset (taxonomy, rownames(taxonomy) %in% colnames(shared))
+taxonomy <- subset(taxonomy, rownames(taxonomy) %in% colnames(shared))
 
 # Merge datasets
 shared <- merge(metadata, shared, by='row.names', all.x=FALSE, all.y=FALSE) # Drops 339 samples
@@ -112,20 +95,27 @@ rm(metadata)
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
 cleared_colonized <- subset(shared, Colonization630 != 'uncolonized')
-cleared_colonized <- subset(cleared_colonized, Day %in% c(-15,-12,1)) # needs work...
-
+cleared_colonized$Colonization630 <- factor(cleared_colonized$Colonization630)
+cleared_colonized_early <- subset(cleared_colonized, Day %in% c(-15,-12))
+cleared_colonized_day1 <- subset(cleared_colonized, Day == 1)
 cleared_colonized$Co_Housed <- NULL
 cleared_colonized$Day <- NULL
 cleared_colonized$Treatment_2 <- NULL
+cleared_colonized_early$Co_Housed <- NULL
+cleared_colonized_early$Day <- NULL
+cleared_colonized_early$Treatment_2 <- NULL
+cleared_colonized_day1$Co_Housed <- NULL
+cleared_colonized_day1$Day <- NULL
+cleared_colonized_day1$Treatment_2 <- NULL
 
 # Adoptive transfer
 adoptive_transfer <- subset(shared, Treatment_2 %in% c('infected_splenocytes','mock_splenocytes'))
-# further subsetting?
+adoptive_transfer$Treatment_2 <- factor(adoptive_transfer$Treatment_2)
 adoptive_transfer$Day <- NULL
 adoptive_transfer$Co_Housed <- NULL
 adoptive_transfer$Colonization630 <- NULL
 
-# What outcome based on co-housing is of interest?
+# What outcome based on co-housing is of interest? ...needs work
 cohousing <- subset(shared, Colonization630 != 'uncolonized')
 cohousing$Colonization630 <- NULL
 cohousing$Co_Housed <- NULL
@@ -135,30 +125,73 @@ cohousing$Treatment_2 <- NULL
 
 rm(shared)
 
+# Remove C. difficile OTUs (all Peptostreptococcaceae - broadest stroke)
+#shared <- subset(shared, !colnames(shared) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
+#taxonomy <- subset(taxonomy, !rownames(taxonomy) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
+
 #--------------------------------------------------------------------#
 
-# Get perumations of groups to equalize random forest
-options(expressions=1e5)
-test <- combinations(n=length(rownames(cleared_colonized[which(cleared_colonized$Colonization630==as.vector(levels(cleared_colonized$Colonization630))[2]),])), 
-                     r=length(rownames(cleared_colonized[which(cleared_colonized$Colonization630==as.vector(levels(cleared_colonized$Colonization630))[1]),])), 
-                     v=rownames(cleared_colonized[which(cleared_colonized$Colonization630==as.vector(levels(cleared_colonized$Colonization630))[2]),]))
-# n -> size of source vector
-# r -> size of target vector
-# v -> source vector
+# Early time point
+# Determine optimal ntree and mtry
+factor1 <- as.vector(levels(cleared_colonized_early$Colonization630))[1]
+factor2 <- as.vector(levels(cleared_colonized_early$Colonization630))[2]
+num1 <- round(length(which(cleared_colonized_early$Colonization630 == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_early$Colonization630 == factor2)) * 0.623)
+ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
+trees <- round(ncol(cleared_colonized_early) - 1) * ntree_multiplier
+tries <- round(sqrt(ncol(cleared_colonized_early) - 1))
+rm(factor1, factor2, num1, num2, ntree_multiplier)
 
+# Run random forest and assess predictive value
+cleared_early_rf <- randomForest(cleared_colonized_early$Colonization630~., data=cleared_colonized_early, importance=TRUE, replace=FALSE, do.trace=500, err.rate=TRUE, ntree=trees, mtry=tries)
+print(cleared_early_rf)
 
-# Run random forest iteratively for all permutations
+# Retreive OTUs with significant MDA
+cleared_importances <- importance(cleared_early_rf, type=1)
+cleared_importances <- subset(cleared_importances, cleared_importances > abs(min(cleared_importances)))
 
+# Merge with taxonomy
+cleared_importances <- merge(cleared_importances, taxonomy, by='row.names', all.x=TRUE)
+rownames(cleared_importances) <- cleared_importances$Row.names
+cleared_importances$Row.names <- NULL
+cleared_importances <- cleared_importances[order(cleared_importances$MeanDecreaseAccuracy),] 
 
+# Subset important OTU abundances from shared file, reorder to match importances
+cleared_early_shared <- cleared_colonized_early[, which(colnames(cleared_colonized_early) %in% rownames(cleared_importances))]
+cleared_early_shared <- cleared_early_shared[,match(rownames(cleared_importances), colnames(cleared_early_shared))]
+cleared_early_shared <- log10(cleared_early_shared + 1)
 
+#--------------------------#
 
+# Day 1 of infection experiment
+# Determine optimal ntree and mtry
+factor1 <- as.vector(levels(cleared_colonized_day1$Colonization630))[1]
+factor2 <- as.vector(levels(cleared_colonized_day1$Colonization630))[2]
+num1 <- round(length(which(cleared_colonized_day1$Colonization630 == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_day1$Colonization630 == factor2)) * 0.623)
+ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
+trees <- round(ncol(cleared_colonized_day1) - 1) * ntree_multiplier
+tries <- round(sqrt(ncol(cleared_colonized_day1) - 1))
+rm(factor1, factor2, num1, num2, ntree_multiplier)
 
-RF.importances <- importance(data.randomForest, type=1)
-sig.sort.final <- subset(RF.importances, RF.importances > abs(min(RF.importances)))
+# Run random forest and assess predictive value
+cleared_day1_rf <- randomForest(cleared_colonized_day1$Colonization630~., data=cleared_colonized_day1, importance=TRUE, replace=FALSE, do.trace=500, err.rate=TRUE, ntree=trees, mtry=tries)
+print(cleared_day1_rf)
 
+# Retreive OTUs with significant MDA
+day1_importances <- importance(cleared_day1_rf, type=1)
+day1_importances <- subset(day1_importances, day1_importances > abs(min(day1_importances)))
 
+# Merge with taxonomy
+day1_importances <- merge(day1_importances, taxonomy, by='row.names', all.x=TRUE)
+rownames(day1_importances) <- day1_importances$Row.names
+day1_importances$Row.names <- NULL
+day1_importances <- day1_importances[order(day1_importances$MeanDecreaseAccuracy),] 
 
-
+# Subset important OTU abundances from shared file, reorder to match importances
+cleared_day1_shared <- cleared_colonized_day1[, which(colnames(cleared_colonized_day1) %in% rownames(day1_importances))]
+cleared_day1_shared <- cleared_day1_shared[,match(rownames(day1_importances), colnames(cleared_day1_shared))]
+cleared_day1_shared <- log10(cleared_day1_shared + 1)
 
 #--------------------------------------------------------------------#
 
@@ -176,8 +209,7 @@ layout(matrix(c(1,2,
 par(mar=c(3,3,1,1), xaxs='i', xpd=FALSE, mgp=c(2,1,0))
 dotchart(importances$Metabolite_score, labels=importances$Compound_name,
          lcolor=NA, cex=1.2, groups=importances$abx, color='black',
-         xlab='Importance Score', xlim=c(0,10), pch=19, lwd=3,
-         gcolor=c('darkmagenta',wes_palette('FantasticFox')[1],wes_palette('FantasticFox')[3],wes_palette('FantasticFox')[5],'forestgreen'))
+         xlab='Importance Score', xlim=c(0,10), pch=19, lwd=3)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-17, cex=1.7)
 segments(x0=rep(0, 15), y0=c(1:5, 8:11, 14:18, 21:25, 28:32), 
          x1=rep(12, 15), y1=c(1:5, 8:11, 14:18, 21:25, 28:32), lty=2) # Dotted lines

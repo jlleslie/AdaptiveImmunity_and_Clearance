@@ -11,7 +11,7 @@ outfile = open(sys.argv[2],'w')
 
 with open(sys.argv[1], 'r') as tax:
 
-	outfile.write('otu\tphylum\tfamily\n')
+	outfile.write('otu\tphylum\tfamily\tgenus\n')
 
 	tax.readline()
 	for line in tax:
@@ -25,7 +25,7 @@ with open(sys.argv[1], 'r') as tax:
 		family = taxon[4]
 		genus = taxon[5] # generate a second file for this level
 
-		outfile.write('\t'.join([otu, phylum, family + '\n']))
+		outfile.write('\t'.join([otu, phylum, family, genus + '\n']))
 
 outfile.close()
 
