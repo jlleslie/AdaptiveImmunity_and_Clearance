@@ -109,25 +109,24 @@ cleared_colonized_day1$Day <- NULL
 cleared_colonized_day1$Treatment_2 <- NULL
 
 # Adoptive transfer
-adoptive_transfer <- subset(shared, Treatment_2 %in% c('infected_splenocytes','mock_splenocytes'))
-adoptive_transfer$Treatment_2 <- factor(adoptive_transfer$Treatment_2)
-adoptive_transfer$Day <- NULL
-adoptive_transfer$Co_Housed <- NULL
-adoptive_transfer$Colonization630 <- NULL
+#adoptive_transfer <- subset(shared, Treatment_2 %in% c('infected_splenocytes','mock_splenocytes'))
+#adoptive_transfer$Treatment_2 <- factor(adoptive_transfer$Treatment_2)
+#adoptive_transfer$Day <- NULL
+#adoptive_transfer$Co_Housed <- NULL
+#adoptive_transfer$Colonization630 <- NULL
 
 # What outcome based on co-housing is of interest? ...needs work
-cohousing <- subset(shared, Colonization630 != 'uncolonized')
-cohousing$Colonization630 <- NULL
-cohousing$Co_Housed <- NULL
-cohousing$Treatment_Grp <- NULL
-cohousing$Treatment_1 <- NULL
-cohousing$Treatment_2 <- NULL
-
-rm(shared)
+#cohousing <- subset(shared, Colonization630 != 'uncolonized')
+#cohousing$Colonization630 <- NULL
+#cohousing$Co_Housed <- NULL
+#cohousing$Treatment_Grp <- NULL
+#cohousing$Treatment_1 <- NULL
+#cohousing$Treatment_2 <- NULL
 
 # Remove C. difficile OTUs (all Peptostreptococcaceae - broadest stroke)
 #shared <- subset(shared, !colnames(shared) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
 #taxonomy <- subset(taxonomy, !rownames(taxonomy) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
+rm(shared)
 
 #--------------------------------------------------------------------#
 
@@ -149,6 +148,7 @@ print(cleared_early_rf)
 # Retreive OTUs with significant MDA
 cleared_importances <- importance(cleared_early_rf, type=1)
 cleared_importances <- subset(cleared_importances, cleared_importances > abs(min(cleared_importances)))
+rm(cleared_early_rf)
 
 # Merge with taxonomy
 cleared_importances <- merge(cleared_importances, taxonomy, by='row.names', all.x=TRUE)
@@ -181,6 +181,7 @@ print(cleared_day1_rf)
 # Retreive OTUs with significant MDA
 day1_importances <- importance(cleared_day1_rf, type=1)
 day1_importances <- subset(day1_importances, day1_importances > abs(min(day1_importances)))
+rm(cleared_day1_rf)
 
 # Merge with taxonomy
 day1_importances <- merge(day1_importances, taxonomy, by='row.names', all.x=TRUE)
@@ -192,6 +193,10 @@ day1_importances <- day1_importances[order(day1_importances$MeanDecreaseAccuracy
 cleared_day1_shared <- cleared_colonized_day1[, which(colnames(cleared_colonized_day1) %in% rownames(day1_importances))]
 cleared_day1_shared <- cleared_day1_shared[,match(rownames(day1_importances), colnames(cleared_day1_shared))]
 cleared_day1_shared <- log10(cleared_day1_shared + 1)
+
+# Delete unneeded variables
+
+
 
 #--------------------------------------------------------------------#
 
