@@ -5,7 +5,7 @@ gc()
 set.seed(8619)
 
 # Load dependencies
-deps <- c('randomForest', 'vegan');
+deps <- c('randomForest', 'vegan', 'plotrix');
 for (dep in deps){
   if (dep %in% installed.packages()[,'Package'] == FALSE){
     install.packages(as.character(dep), quiet=TRUE);
@@ -31,6 +31,16 @@ filter_table <- function(data) {
   return(filtered_data)
 }
 
+# Finds index of median in a vector
+which.median = function(x) {
+  if (length(x) %% 2 != 0) {
+    which(x == median(x))
+  } else if (length(x) %% 2 == 0) {
+    a = sort(x)[c(length(x)/2, length(x)/2+1)]
+    c(which(x == a[1]), which(x == a[2]))
+  }
+}
+
 # Define data files
 metadata <- '~/Desktop/Repositories/clearance_2017/Adaptiveimmuneclear_metadata_noD40.42.txt'
 shared <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.shared'
@@ -50,11 +60,17 @@ shared$numOtus <- NULL
 shared$label <- NULL
 taxonomy <- read.delim(taxonomy, sep='\t', header=T, row.names=1)
 taxonomy$Size <- NULL
+taxonomy$phylum <- gsub('_', ' ', taxonomy$phylum)
+taxonomy$family <- gsub('_', ' ', taxonomy$family)
+taxonomy$genus <- gsub('_', ' ', taxonomy$genus)
 
 #--------------------------------------------------------------------#
 
 # Decide on optimal subsample level
 sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
+
+# Find sample with median diversity
+median_diversity <- names(which.median(diversity(shared, index='invsimpson', MARGIN=1)))
 
 # Plot abundances to pick a subsample size
 pdf(file='~/Desktop/Repositories/clearance_2017/subsample_plot.pdf', width=8, height=4)
@@ -66,10 +82,12 @@ text(x=200, y=85000, 'Subsample Size:', cex=0.8)
 text(x=200, y=80000, sub_size)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-8, cex=1.5)
 
-# Rarefaction for random sample to test size
-rarecurve(shared[736,], sample=sub_size)
+# Rarefaction for sample with median inv. Simpson diversity
+rarecurve(shared[median_diversity,], sample=sub_size)
 mtext('B', side=2, line=2, las=2, adj=1, padj=-8, cex=1.5)
 dev.off()
+
+rm(median_diversity)
 
 #--------------------------------------------------------------------#
 
@@ -79,7 +97,7 @@ shared <- as.data.frame(t(shared))
 shared <- shared[, colSums(shared) > sub_size] # Loses 7% samples
 for (index in 1:ncol(shared)){
   shared[,index] <- t(rrarefy(shared[,index], sample=sub_size))}
-rm(index)
+rm(index, sub_size)
 shared <- as.data.frame(t(shared))
 shared <- filter_table(shared) # Loses 5007 OTUs
 
@@ -96,174 +114,247 @@ rm(metadata)
 # Cleared vs Colonized
 cleared_colonized <- subset(shared, Colonization630 != 'uncolonized')
 cleared_colonized$Colonization630 <- factor(cleared_colonized$Colonization630)
-cleared_colonized_early <- subset(cleared_colonized, Day %in% c(-15,-12))
-cleared_colonized_day1 <- subset(cleared_colonized, Day == 1)
-cleared_colonized$Co_Housed <- NULL
-cleared_colonized$Day <- NULL
-cleared_colonized$Treatment_2 <- NULL
-cleared_colonized_early$Co_Housed <- NULL
-cleared_colonized_early$Day <- NULL
-cleared_colonized_early$Treatment_2 <- NULL
-cleared_colonized_day1$Co_Housed <- NULL
-cleared_colonized_day1$Day <- NULL
-cleared_colonized_day1$Treatment_2 <- NULL
+cleared_colonized_preabx <- subset(cleared_colonized, Day %in% c(-15,-12))
+cleared_colonized_day0 <- subset(cleared_colonized, Day == 0)
+cleared_colonized_preabx$Co_Housed <- NULL
+cleared_colonized_preabx$Day <- NULL
+cleared_colonized_preabx$Treatment_2 <- NULL
+cleared_colonized_day0$Co_Housed <- NULL
+cleared_colonized_day0$Day <- NULL
+cleared_colonized_day0$Treatment_2 <- NULL
+rm(cleared_colonized)
 
-# Adoptive transfer
-#adoptive_transfer <- subset(shared, Treatment_2 %in% c('infected_splenocytes','mock_splenocytes'))
-#adoptive_transfer$Treatment_2 <- factor(adoptive_transfer$Treatment_2)
-#adoptive_transfer$Day <- NULL
-#adoptive_transfer$Co_Housed <- NULL
-#adoptive_transfer$Colonization630 <- NULL
-
-# What outcome based on co-housing is of interest? ...needs work
-#cohousing <- subset(shared, Colonization630 != 'uncolonized')
-#cohousing$Colonization630 <- NULL
-#cohousing$Co_Housed <- NULL
-#cohousing$Treatment_Grp <- NULL
-#cohousing$Treatment_1 <- NULL
-#cohousing$Treatment_2 <- NULL
-
-# Remove C. difficile OTUs (all Peptostreptococcaceae - broadest stroke)
-#shared <- subset(shared, !colnames(shared) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
-#taxonomy <- subset(taxonomy, !rownames(taxonomy) %in% c('Otu0004', 'Otu0333', 'Otu0349', 'Otu0457', 'Otu0478', 'Otu0744', 'Otu0802', 'Otu1409', 'Otu1541'))
 rm(shared)
 
 #--------------------------------------------------------------------#
 
-# Early time point
+# preabx time point
 # Determine optimal ntree and mtry
-factor1 <- as.vector(levels(cleared_colonized_early$Colonization630))[1]
-factor2 <- as.vector(levels(cleared_colonized_early$Colonization630))[2]
-num1 <- round(length(which(cleared_colonized_early$Colonization630 == factor1)) * 0.623)
-num2 <- round(length(which(cleared_colonized_early$Colonization630 == factor2)) * 0.623)
+factor1 <- as.vector(levels(cleared_colonized_preabx$Colonization630))[1]
+factor2 <- as.vector(levels(cleared_colonized_preabx$Colonization630))[2]
+num1 <- round(length(which(cleared_colonized_preabx$Colonization630 == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_preabx$Colonization630 == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
-trees <- round(ncol(cleared_colonized_early) - 1) * ntree_multiplier
-tries <- round(sqrt(ncol(cleared_colonized_early) - 1))
+trees <- round(ncol(cleared_colonized_preabx) - 1) * ntree_multiplier
+tries <- round(sqrt(ncol(cleared_colonized_preabx) - 1))
 rm(factor1, factor2, num1, num2, ntree_multiplier)
 
 # Run random forest and assess predictive value
-cleared_early_rf <- randomForest(cleared_colonized_early$Colonization630~., data=cleared_colonized_early, importance=TRUE, replace=FALSE, do.trace=500, err.rate=TRUE, ntree=trees, mtry=tries)
-print(cleared_early_rf)
+cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630~., 
+                                  data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
+                                  do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
+rm(trees, tries)
 
-# Retreive OTUs with significant MDA
-cleared_importances <- importance(cleared_early_rf, type=1)
-cleared_importances <- subset(cleared_importances, cleared_importances > abs(min(cleared_importances)))
-rm(cleared_early_rf)
+# Retreive importance and overall error rate
+preabx_importances <- importance(cleared_preabx_rf, type=1)
+preabx_accuracy <- paste('Accuracy = ',as.character((100-round((median(cleared_preabx_rf$err.rate[,1])*100), 2))),'%',sep='')
 
-# Merge with taxonomy
-cleared_importances <- merge(cleared_importances, taxonomy, by='row.names', all.x=TRUE)
-rownames(cleared_importances) <- cleared_importances$Row.names
-cleared_importances$Row.names <- NULL
-cleared_importances <- cleared_importances[order(cleared_importances$MeanDecreaseAccuracy),] 
+# Merge remaining important OTUs with taxonomy
+preabx_importances <- merge(preabx_importances, taxonomy, by='row.names', all.x=TRUE)
+rownames(preabx_importances) <- preabx_importances$Row.names
+preabx_importances$Row.names <- NULL
+colnames(preabx_importances)[1] <- 'MDA'
 
-# Subset important OTU abundances from shared file, reorder to match importances
-cleared_early_shared <- cleared_colonized_early[, which(colnames(cleared_colonized_early) %in% rownames(cleared_importances))]
-cleared_early_shared <- cleared_early_shared[,match(rownames(cleared_importances), colnames(cleared_early_shared))]
-cleared_early_shared <- log10(cleared_early_shared + 1)
+# Subset to the most important OTUs and sort
+preabx_importances <- subset(preabx_importances, preabx_importances$MDA > abs(min(preabx_importances$MDA)))
+preabx_importances <- as.data.frame(preabx_importances[order(-preabx_importances$MDA),])
+preabx_importances <- preabx_importances[1:10,]
+preabx_importances <- as.data.frame(preabx_importances[order(preabx_importances$MDA),])
+rm(cleared_preabx_rf)
 
-#--------------------------#
+# Subset important OTU abundances from shared file
+cleared_preabx_shared <- cleared_colonized_preabx[, c(1,which(colnames(cleared_colonized_preabx) %in% rownames(preabx_importances)))]
+rm(cleared_colonized_preabx)
+
+# Break into experimental groups
+colonized_preabx_shared <- subset(cleared_preabx_shared, Colonization630 == 'colonized')
+colonized_preabx_shared$Colonization630 <- NULL
+colonized_preabx_shared <- colonized_preabx_shared[,match(rownames(preabx_importances), colnames(colonized_preabx_shared))] 
+cleared_preabx_shared <- subset(cleared_preabx_shared, Colonization630 == 'cleared')
+cleared_preabx_shared$Colonization630 <- NULL
+cleared_preabx_shared <- cleared_preabx_shared[,match(rownames(preabx_importances), colnames(cleared_preabx_shared))]
+
+#---------------------#
 
 # Day 1 of infection experiment
 # Determine optimal ntree and mtry
-factor1 <- as.vector(levels(cleared_colonized_day1$Colonization630))[1]
-factor2 <- as.vector(levels(cleared_colonized_day1$Colonization630))[2]
-num1 <- round(length(which(cleared_colonized_day1$Colonization630 == factor1)) * 0.623)
-num2 <- round(length(which(cleared_colonized_day1$Colonization630 == factor2)) * 0.623)
+factor1 <- as.vector(levels(cleared_colonized_day0$Colonization630))[1]
+factor2 <- as.vector(levels(cleared_colonized_day0$Colonization630))[2]
+num1 <- round(length(which(cleared_colonized_day0$Colonization630 == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_day0$Colonization630 == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
-trees <- round(ncol(cleared_colonized_day1) - 1) * ntree_multiplier
-tries <- round(sqrt(ncol(cleared_colonized_day1) - 1))
+trees <- round(ncol(cleared_colonized_day0) - 1) * ntree_multiplier
+tries <- round(sqrt(ncol(cleared_colonized_day0) - 1))
 rm(factor1, factor2, num1, num2, ntree_multiplier)
 
 # Run random forest and assess predictive value
-cleared_day1_rf <- randomForest(cleared_colonized_day1$Colonization630~., data=cleared_colonized_day1, importance=TRUE, replace=FALSE, do.trace=500, err.rate=TRUE, ntree=trees, mtry=tries)
-print(cleared_day1_rf)
+cleared_day0_rf <- randomForest(cleared_colonized_day0$Colonization630~., 
+                                data=cleared_colonized_day0, importance=TRUE, replace=FALSE, 
+                                do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
+rm(trees, tries)
 
-# Retreive OTUs with significant MDA
-day1_importances <- importance(cleared_day1_rf, type=1)
-day1_importances <- subset(day1_importances, day1_importances > abs(min(day1_importances)))
-rm(cleared_day1_rf)
+# Retreive importance and overall error rate
+day0_importances <- importance(cleared_day0_rf, type=1)
+day0_accuracy <- paste('Accuracy = ',as.character((100-round((median(cleared_day0_rf$err.rate[,1])*100), 2))),'%',sep='')
 
-# Merge with taxonomy
-day1_importances <- merge(day1_importances, taxonomy, by='row.names', all.x=TRUE)
-rownames(day1_importances) <- day1_importances$Row.names
-day1_importances$Row.names <- NULL
-day1_importances <- day1_importances[order(day1_importances$MeanDecreaseAccuracy),] 
+# Merge remaining important OTUs with taxonomy
+day0_importances <- merge(day0_importances, taxonomy, by='row.names', all.x=TRUE)
+rownames(day0_importances) <- day0_importances$Row.names
+day0_importances$Row.names <- NULL
+colnames(day0_importances)[1] <- 'MDA'
+rm(taxonomy)
 
-# Subset important OTU abundances from shared file, reorder to match importances
-cleared_day1_shared <- cleared_colonized_day1[, which(colnames(cleared_colonized_day1) %in% rownames(day1_importances))]
-cleared_day1_shared <- cleared_day1_shared[,match(rownames(day1_importances), colnames(cleared_day1_shared))]
-cleared_day1_shared <- log10(cleared_day1_shared + 1)
+# Subset to the most important OTUs and sort
+day0_importances <- subset(day0_importances, day0_importances$MDA > abs(min(day0_importances$MDA)))
+day0_importances <- as.data.frame(day0_importances[order(-day0_importances$MDA),])
+day0_importances <- day0_importances[1:10,]
+day0_importances <- as.data.frame(day0_importances[order(day0_importances$MDA),])
+rm(cleared_day0_rf)
 
-# Delete unneeded variables
+# Subset important OTU abundances from shared file
+cleared_day0_shared <- cleared_colonized_day0[, c(1,which(colnames(cleared_colonized_day0) %in% rownames(day0_importances)))]
+rm(cleared_colonized_day0)
 
+# Break into experimental groups and match order to importance
+colonized_day0_shared <- subset(cleared_day0_shared, Colonization630 == 'colonized')
+colonized_day0_shared$Colonization630 <- NULL
+colonized_day0_shared <- colonized_day0_shared[,match(rownames(day0_importances), colnames(colonized_day0_shared))] 
+cleared_day0_shared <- subset(cleared_day0_shared, Colonization630 == 'cleared')
+cleared_day0_shared$Colonization630 <- NULL
+cleared_day0_shared <- cleared_day0_shared[,match(rownames(day0_importances), colnames(cleared_day0_shared))] 
 
+#--------------------------------------------------------------------#
+
+# Testing for significant change abundance
+# Pre-antibiotics
+preabx_pvalues <- c()
+for (index in 1:ncol(colonized_preabx_shared)){
+  preabx_pvalues[index] <- wilcox.test(cleared_preabx_shared[,index], colonized_preabx_shared[,index], exact=FALSE)$p.value
+}
+preabx_pvalues <- round(p.adjust(preabx_pvalues, method='BH'), 3)
+for (index in 1:length(preabx_pvalues)) {
+  if (preabx_pvalues[index] == 0) {
+    preabx_pvalues[index] <- '< 0.001 ***'
+  }
+  else if (preabx_pvalues[index] == 0.001) {
+    preabx_pvalues[index] <- paste('= ', as.character(preabx_pvalues[index]), ' ***', sep='')
+  }
+  else if (preabx_pvalues[index] <= 0.01) {
+    preabx_pvalues[index] <- paste('= ', as.character(preabx_pvalues[index]), ' **', sep='')
+  }
+  else if (preabx_pvalues[index] <= 0.05) {
+    preabx_pvalues[index] <- paste('= ', as.character(preabx_pvalues[index]), ' *', sep='')
+  }
+  else {
+    preabx_pvalues[index] <- paste('= ', as.character(preabx_pvalues[index]), ' n.s.', sep='')
+    }
+}
+preabx_importances$pvalues <- preabx_pvalues
+rm(preabx_pvalues)
+
+# Infection Day 0
+day0_pvalues <- c()
+for (index in 1:ncol(colonized_day0_shared)){
+  day0_pvalues[index] <- wilcox.test(cleared_day0_shared[,index], colonized_day0_shared[,index], exact=FALSE)$p.value
+}
+day0_pvalues <- round(p.adjust(day0_pvalues, method='BH'), 3)
+for (index in 1:length(day0_pvalues)) {
+  if (day0_pvalues[index] == 0) {
+    day0_pvalues[index] <- '< 0.001 ***'
+  }
+  else if (day0_pvalues[index] == 0.001) {
+    day0_pvalues[index] <- paste('= ', as.character(day0_pvalues[index]), ' ***', sep='')
+  }
+  else if (day0_pvalues[index] <= 0.01) {
+    day0_pvalues[index] <- paste('= ', as.character(day0_pvalues[index]), ' **', sep='')
+  }
+  else if (day0_pvalues[index] <= 0.05) {
+    day0_pvalues[index] <- paste('= ', as.character(day0_pvalues[index]), ' *', sep='')
+  }
+  else {
+    day0_pvalues[index] <- paste('= ', as.character(day0_pvalues[index]), ' n.s.', sep='')
+  }
+}
+day0_importances$pvalues <- day0_pvalues
+rm(day0_pvalues)
+
+# Log10 transform for easier viewing
+cleared_preabx_shared <- log10(cleared_preabx_shared + 1)
+colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
+cleared_day0_shared <- log10(cleared_day0_shared + 1)
+colonized_day0_shared <- log10(colonized_day0_shared + 1)
 
 #--------------------------------------------------------------------#
 
 # Set up plotting environment
-plot_file <- '~/Desktop/rf_plot.pdf'
-pdf(file=plot_file, width=6, height=12)
-layout(matrix(c(1,2,
-                3,4,
-                5,6), nrow=3, ncol=2, byrow=TRUE))
+plot_file <- '~/Desktop/Repositories/clearance_2017/preabx_RF_plot.pdf'
+pdf(file=plot_file, width=10, height=6)
+layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
-#--------------------------------------------------------------------#
+#---------------------#
 
 # Cleared vs colonized
 # RF mean decrease accuracy
-par(mar=c(3,3,1,1), xaxs='i', xpd=FALSE, mgp=c(2,1,0))
-dotchart(importances$Metabolite_score, labels=importances$Compound_name,
-         lcolor=NA, cex=1.2, groups=importances$abx, color='black',
-         xlab='Importance Score', xlim=c(0,10), pch=19, lwd=3)
-mtext('A', side=2, line=2, las=2, adj=1, padj=-17, cex=1.7)
-segments(x0=rep(0, 15), y0=c(1:5, 8:11, 14:18, 21:25, 28:32), 
-         x1=rep(12, 15), y1=c(1:5, 8:11, 14:18, 21:25, 28:32), lty=2) # Dotted lines
+par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
+dotchart(preabx_importances$MDA, labels=rownames(preabx_importances),
+         lcolor=NA, cex=1.2, color='black', 
+         xlab='', xlim=c(8,15), pch=19, lwd=3)
+segments(x0=rep(8, 10), y0=c(1:10), x1=rep(15, 10), y1=c(1:10), lty=2) # Dotted lines
+legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
+par(xaxt='s')
+axis(side=1, at=c(8:15), labels=c(0,9:15), cex.axis=1.2, tck=-0.025)
+axis.break(1, 8.5, style='slash')
+mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
+mtext('A', side=2, line=2, las=2, adj=1, padj=-12.5, cex=1.7)
 
-# OTU abundance changes
-plot(1, type='n', ylim=c(0,length(clinda_otus)*2), xlim=c(0,4), 
-     ylab='', xlab=expression(paste('Normalized Abundance (',log[10],')')), xaxt='n', yaxt='n')
-title('Clindamycin-pretreated', line=0.5, cex.main=1.1, font.main=2, col.main=clinda_col)
+# OTU abundance differences
+par(mar=c(3,19,1,1), xaxs='r', mgp=c(2,1,0))
+plot(1, type='n', ylim=c(0.8, (ncol(cleared_preabx_shared)*2)-0.8), xlim=c(0,3), 
+     ylab='', xlab='Abundance', xaxt='n', yaxt='n', cex.lab=1.4)
 index <- 1
-for(i in colnames(cleared_otu)){
-  stripchart(at=index-0.35, jitter(cleared_otu[,i], amount=1e-5), 
-             pch=21, bg='firebrick1', method='jitter', jitter=0.12, cex=1.5, lwd=0.5, add=TRUE)
-  stripchart(at=index+0.35, jitter(colonized_otu[,i], amount=1e-5), 
-             pch=21, bg='dodgerblue1', method='jitter', jitter=0.12, cex=1.5, lwd=0.5, add=TRUE)
-  if (i != colnames(clinda_mock_otu)[length(colnames(clinda_mock_otu))]){
+for(i in colnames(cleared_preabx_shared)){
+  stripchart(at=index+0.35, cleared_preabx_shared[,i], 
+             pch=21, bg='firebrick1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+  stripchart(at=index-0.35, colonized_preabx_shared[,i], 
+             pch=21, bg='dodgerblue1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+  if (i != colnames(cleared_preabx_shared)[length(colnames(cleared_preabx_shared))]){
     abline(h=index+1, lty=2)
   }
-  segments(median(clinda_mock_otu[,i]), index-0.4, median(clinda_mock_otu[,i]), index, lwd=2) #adds line for median
-  segments(median(clinda_infected_otu[,i]), index+0.4, median(clinda_infected_otu[,i]), index, lwd=2)
+  segments(median(cleared_preabx_shared[,i]), index+0.6, median(cleared_preabx_shared[,i]), index+0.1, lwd=2.5) #adds line for median
+  segments(median(colonized_preabx_shared[,i]), index-0.6, median(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
   index <- index + 2
 }
-axis(1, at=seq(0,4,1), label=c('0','10','100','1000','10000'))
-minor.ticks.axis(1, 10, mn=0, mx=4)
+axis(side=1, at=c(0:3), label=c('0','10','100','1000'), cex.axis=1.2, tck=-0.02)
+
+
+
+
+minors <- c(.3,.6,.8,.6,.7,.75,.8,.8333,.8666)
+
+
+
+axis(side=1, at=minors, label='', tck=-0.01)
+axis(side=1, at=minors+1, label='', tck=-0.01)
+axis(side=1, at=minors+2, label='', tck=-0.01)
+
 legend('topright', legend=c('Cleared', 'Colonized'),
-       pch=c(21, 21), pt.bg=c('firebrick1','dodgerblue1'), bg='white', pt.cex=1.4, cex=0.9)
-formatted <- lapply(1:length(clinda_otus), function(i) bquote(paste(italic(.(clinda_genera[i])), .(clinda_otus[i]), sep=' ')))
-axis(2, at=seq(1,index-2,2)+0.4, labels=do.call(expression, formatted), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
-axis(2, at=seq(1,index-2,2), labels=clinda_phyla, las=1, line=-0.5, tick=F, cex.axis=1.1) 
-formatted <- lapply(1:length(clinda_pvalues), function(i) bquote(paste(italic('p'), .(clinda_pvalues[i]), sep=' ')))
-axis(2, at=seq(1,index-2,2)-0.5, labels=do.call(expression, formatted), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
-
-#---------------------#
-
-# Adoptive transfer
-
-#---------------------#
-
-# Cohousing
-
+       pch=c(21, 21), pt.bg=c('firebrick1','dodgerblue1'), bg='white', pt.cex=1.7, cex=1.2)
+axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(preabx_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
+formatted_taxa <- lapply(1:nrow(preabx_importances), function(x) bquote(paste(.(preabx_importances$phylum[x]),'; ',italic(.(preabx_importances$genus[x])), sep='')))
+axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
+italic_p <- lapply(1:length(preabx_importances$pvalues), function(x) bquote(paste(italic('p'), .(preabx_importances$pvalues[x]), sep=' ')))
+axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
+mtext('B', side=2, line=2, las=2, adj=13, padj=-13, cex=1.7)
 
 dev.off()
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
 
 #Clean up
-for (dep in deps){
-  pkg <- paste('package:', dep, sep='')
-  detach(pkg, character.only = TRUE)
-}
-rm(list=ls())
-gc()
+#for (dep in deps){
+#  pkg <- paste('package:', dep, sep='')
+#  detach(pkg, character.only = TRUE)
+#}
+#rm(list=ls())
+#gc()
 
