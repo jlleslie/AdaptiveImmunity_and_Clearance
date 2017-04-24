@@ -25,7 +25,10 @@ which.median = function(x) {
 }
 
 # Define data files
-shared <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.shared'
+shared <- '~/Desktop/Repositories/clearance_2017/data/CDIclear.final.shared'
+
+# Define output file
+plot_file <- '~/Desktop/Repositories/clearance_2017/figures/subsample_plot.pdf'
 
 # Read in data and eliminate extra columns
 shared <- read.delim(shared, sep='\t', header=T, row.names=2)
@@ -41,7 +44,7 @@ sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
 median_diversity <- names(which.median(diversity(shared, index='invsimpson', MARGIN=1)))
 
 # Plot abundances to pick a subsample size
-pdf(file='~/Desktop/Repositories/clearance_2017/subsample_plot.pdf', width=8, height=4)
+pdf(file=plot_file, width=8, height=4)
 layout(matrix(c(1,2), nrow=1, ncol=2, byrow=TRUE))
 par(mar=c(3,3,1,1), mgp=c(2,1,0))
 plot(sort(rowSums(shared)), pch=20, xlab='Sample', ylab='Abundance')

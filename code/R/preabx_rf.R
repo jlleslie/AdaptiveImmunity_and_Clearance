@@ -32,9 +32,12 @@ filter_table <- function(data) {
 }
 
 # Define data files
-metadata <- '~/Desktop/Repositories/clearance_2017/Adaptiveimmuneclear_metadata_noD40.42.txt'
-shared <- '~/Desktop/Repositories/clearance_2017/CDIclear.final.shared'
-taxonomy <- '~/Desktop/Repositories/clearance_2017/clearance.formatted.taxonomy'
+metadata <- '~/Desktop/Repositories/clearance_2017/data/Adaptiveimmuneclear_metadata_noD40.42.txt'
+shared <- '~/Desktop/Repositories/clearance_2017/data/CDIclear.final.shared'
+taxonomy <- '~/Desktop/Repositories/clearance_2017/data/clearance.formatted.taxonomy'
+
+# Define output file
+plot_file <- '~/Desktop/Repositories/clearance_2017/figures/preabx_RF_plot.pdf'
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -173,7 +176,6 @@ colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
 #--------------------------------------------------------------------#
 
 # Set up plotting environment
-plot_file <- '~/Desktop/Repositories/clearance_2017/preabx_RF_plot.pdf'
 pdf(file=plot_file, width=11, height=6)
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
