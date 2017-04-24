@@ -288,7 +288,7 @@ colonized_day0_shared <- log10(colonized_day0_shared + 1)
 
 # Set up plotting environment
 plot_file <- '~/Desktop/Repositories/clearance_2017/preabx_RF_plot.pdf'
-pdf(file=plot_file, width=10, height=6)
+pdf(file=plot_file, width=11, height=6)
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
 #---------------------#
@@ -325,18 +325,10 @@ for(i in colnames(cleared_preabx_shared)){
   index <- index + 2
 }
 axis(side=1, at=c(0:3), label=c('0','10','100','1000'), cex.axis=1.2, tck=-0.02)
-
-
-
-
-minors <- c(.3,.6,.8,.6,.7,.75,.8,.8333,.8666)
-
-
-
-axis(side=1, at=minors, label='', tck=-0.01)
-axis(side=1, at=minors+1, label='', tck=-0.01)
-axis(side=1, at=minors+2, label='', tck=-0.01)
-
+minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98)
+axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01)
 legend('topright', legend=c('Cleared', 'Colonized'),
        pch=c(21, 21), pt.bg=c('firebrick1','dodgerblue1'), bg='white', pt.cex=1.7, cex=1.2)
 axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(preabx_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
@@ -348,13 +340,70 @@ mtext('B', side=2, line=2, las=2, adj=13, padj=-13, cex=1.7)
 
 dev.off()
 
+#--------------------------------------------------------------------#
+
+# Set up plotting environment
+plot_file <- '~/Desktop/Repositories/clearance_2017/day0_RF_plot.pdf'
+pdf(file=plot_file, width=11, height=6)
+layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
+
+#---------------------#
+
+# Day 0
+# RF mean decrease accuracy
+par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
+dotchart(day0_importances$MDA, labels=rownames(day0_importances),
+         lcolor=NA, cex=1.2, color='black', 
+         xlab='', xlim=c(5,13), pch=19, lwd=3)
+segments(x0=rep(5, 10), y0=c(1:10), x1=rep(13, 10), y1=c(1:10), lty=2) # Dotted lines
+legend('bottomright', legend=day0_accuracy, pt.cex=0, cex=1.2, bty='n')
+par(xaxt='s')
+axis(side=1, at=c(5:13), labels=c(0,6:13), cex.axis=1.2, tck=-0.025)
+axis.break(1, 5.5, style='slash')
+mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
+mtext('A', side=2, line=2, las=2, adj=1, padj=-12.5, cex=1.7)
+
+# OTU abundance differences
+par(mar=c(3,20,1,1), xaxs='r', mgp=c(2,1,0))
+plot(1, type='n', ylim=c(0.8, (ncol(cleared_day0_shared)*2)-0.8), xlim=c(0,4), 
+     ylab='', xlab='Abundance', xaxt='n', yaxt='n', cex.lab=1.4)
+index <- 1
+for(i in colnames(cleared_day0_shared)){
+  stripchart(at=index+0.35, cleared_day0_shared[,i], 
+             pch=21, bg='firebrick1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+  stripchart(at=index-0.35, colonized_day0_shared[,i], 
+             pch=21, bg='dodgerblue1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+  if (i != colnames(cleared_day0_shared)[length(colnames(cleared_day0_shared))]){
+    abline(h=index+1, lty=2)
+  }
+  segments(median(cleared_day0_shared[,i]), index+0.6, median(cleared_day0_shared[,i]), index+0.1, lwd=2.5) #adds line for median
+  segments(median(colonized_day0_shared[,i]), index-0.6, median(colonized_day0_shared[,i]), index-0.1, lwd=2.5)
+  index <- index + 2
+}
+axis(side=1, at=c(0:4), label=c('0','10','100','1000','10000'), cex.axis=1.2, tck=-0.02)
+minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98)
+axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01)
+legend('topright', legend=c('Cleared', 'Colonized'),
+       pch=c(21, 21), pt.bg=c('firebrick1','dodgerblue1'), bg='white', pt.cex=1.7, cex=1.2)
+axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(day0_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
+formatted_taxa <- lapply(1:nrow(day0_importances), function(x) bquote(paste(.(day0_importances$phylum[x]),'; ',italic(.(day0_importances$genus[x])), sep='')))
+axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
+italic_p <- lapply(1:length(day0_importances$pvalues), function(x) bquote(paste(italic('p'), .(day0_importances$pvalues[x]), sep=' ')))
+axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
+mtext('B', side=2, line=2, las=2, adj=13, padj=-13, cex=1.7)
+
+dev.off()
+
 #-------------------------------------------------------------------------------------------------------------------------------------#
 
 #Clean up
-#for (dep in deps){
-#  pkg <- paste('package:', dep, sep='')
-#  detach(pkg, character.only = TRUE)
-#}
-#rm(list=ls())
-#gc()
+for (dep in deps){
+  pkg <- paste('package:', dep, sep='')
+  detach(pkg, character.only = TRUE)
+}
+rm(list=ls())
+gc()
 
