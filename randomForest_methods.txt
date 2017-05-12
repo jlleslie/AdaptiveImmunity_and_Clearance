@@ -1,0 +1,9 @@
+
+
+Random Forest and relative abundance statistical comparisons
+
+Random Forest analysis was performed using R (v.3.2.3) using the randomForest package (1,2). Model parameters ntree and mtry were tuned based on the input datasets in order to achieve optimal classification without overfitting (3). Briefly, ntree was calculated by multiplying the total number of OTUs included in the analysis by a ratio of the quantity of samples in each classification category. Additionally, mtry was defined as the square root of the number of OTUs. The significance cutoff for Mean Decease Accuracy (MDA) values was determined by the absolute value of the lowest MDA measured. Testing for significant difference in OTU relative abundance following feature selection was performed using Wilcoxon signed-rank test with Benjamini–Hochberg correction.
+
+1. Breiman, L. (2001). Random Forests. Machine Learning. 45(1); 5-32.
+2. Liaw and M. Wiener (2002). Classification and Regression by randomForest. R News. 2(3); 18-22.
+3. Huang BF & Boutros PC. (2016). The parameter sensitivity of random forests. BMC Bioinformatics. 17:331.
