@@ -33,7 +33,7 @@ filter_table <- function(data) {
 
 # Define data files
 metadata <- '~/Desktop/Repositories/clearance_2017/data/Adaptiveimmuneclear_metadata_noD40.42.txt'
-shared <- '~/Desktop/Repositories/clearance_2017/data/CDIclear.final.shared'
+shared <- '~/Desktop/Repositories/clearance_2017/data/Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared'
 taxonomy <- '~/Desktop/Repositories/clearance_2017/data/clearance.formatted.taxonomy'
 
 # Define output file
@@ -61,16 +61,16 @@ taxonomy$genus <- gsub('_', ' ', taxonomy$genus)
 
 # Format data
 # Decide on optimal subsample level
-sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
+#sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
 
 # Rarefy and filter shared file
-shared <- as.data.frame(t(shared))
-shared <- shared[, colSums(shared) > sub_size] # Loses 7% samples
-for (index in 1:ncol(shared)){
-  shared[,index] <- t(rrarefy(shared[,index], sample=sub_size))}
-rm(index, sub_size)
-shared <- as.data.frame(t(shared))
-shared <- filter_table(shared) # Loses 5007 OTUs
+#shared <- as.data.frame(t(shared))
+#shared <- shared[, colSums(shared) > sub_size] # Loses 7% samples
+#for (index in 1:ncol(shared)){
+#  shared[,index] <- t(rrarefy(shared[,index], sample=sub_size))}
+#rm(index, sub_size)
+#shared <- as.data.frame(t(shared))
+#shared <- filter_table(shared) # Loses 5007 OTUs
 
 # Subset taxonomy to remaining OTUs
 taxonomy <- subset(taxonomy, rownames(taxonomy) %in% colnames(shared))
