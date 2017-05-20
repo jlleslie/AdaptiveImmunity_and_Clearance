@@ -189,7 +189,7 @@ layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 #---------------------#
 
 # Cleared vs colonized
-# RF mean decrease accuracy
+# RF median decrease accuracy
 par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
 dotchart(preabx_importances$MDA, labels=rownames(preabx_importances),
          lcolor=NA, cex=1.2, color='black', 
@@ -199,7 +199,7 @@ legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
 par(xaxt='s')
 axis(side=1, at=c(7:15), labels=c(0,8:15), cex.axis=1.2, tck=-0.025)
 axis.break(1, 7.5, style='slash')
-mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
+mtext('median Decrease Accuracy', side=1, padj=1.8, cex=0.9)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-13.2, cex=1.7)
 
 # OTU abundance differences
@@ -215,8 +215,8 @@ for(i in colnames(cleared_preabx_shared)){
   if (i != colnames(cleared_preabx_shared)[length(colnames(cleared_preabx_shared))]){
     abline(h=index+1, lty=2)
   }
-  segments(mean(cleared_preabx_shared[,i]), index+0.6, mean(cleared_preabx_shared[,i]), index+0.1, lwd=2.5) #adds line for median
-  segments(mean(colonized_preabx_shared[,i]), index-0.6, mean(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
+  segments(median(cleared_preabx_shared[,i]), index+0.6, median(cleared_preabx_shared[,i]), index+0.1, lwd=2.5) #adds line for median
+  segments(median(colonized_preabx_shared[,i]), index-0.6, median(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
   index <- index + 2
 }
 axis(side=1, at=c(0:3), label=c('0','10','100','1000'), cex.axis=1.2, tck=-0.02)
