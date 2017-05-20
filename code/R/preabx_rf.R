@@ -60,17 +60,6 @@ taxonomy$genus <- gsub('_', ' ', taxonomy$genus)
 #--------------------------------------------------------------------#
 
 # Format data
-# Decide on optimal subsample level
-#sub_size <- floor(as.numeric(quantile(rowSums(shared), probs=0.09)))
-
-# Rarefy and filter shared file
-#shared <- as.data.frame(t(shared))
-#shared <- shared[, colSums(shared) > sub_size] # Loses 7% samples
-#for (index in 1:ncol(shared)){
-#  shared[,index] <- t(rrarefy(shared[,index], sample=sub_size))}
-#rm(index, sub_size)
-#shared <- as.data.frame(t(shared))
-#shared <- filter_table(shared) # Loses 5007 OTUs
 
 # Subset taxonomy to remaining OTUs
 taxonomy <- subset(taxonomy, rownames(taxonomy) %in% colnames(shared))
@@ -90,8 +79,10 @@ cleared_colonized_preabx$Co_Housed <- NULL
 cleared_colonized_preabx$Day <- NULL
 cleared_colonized_preabx$Treatment_2 <- NULL
 rm(cleared_colonized)
-
 rm(shared)
+
+# Subset to most informative OTUs from previous RF analysis
+pruned_shared <- cleared_colonized_preabx[, c('Colonization630','Otu0052', 'Otu0093', 'Otu0026')]
 
 #--------------------------------------------------------------------#
 
@@ -111,10 +102,26 @@ cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630~.,
                                   data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 rm(trees, tries)
+print(cleared_preabx_rf)
 
 # Retreive importance and overall error rate
 preabx_importances <- importance(cleared_preabx_rf, type=1)
 preabx_accuracy <- paste('Accuracy = ',as.character((100-round((median(cleared_preabx_rf$err.rate[,1])*100), 2))),'%',sep='')
+
+# Get accuracy of binning from pruned feature set
+factor1 <- as.vector(levels(pruned_shared$Colonization630))[1]
+factor2 <- as.vector(levels(pruned_shared$Colonization630))[2]
+num1 <- round(length(which(pruned_shared$Colonization630 == factor1)) * 0.623)
+num2 <- round(length(which(pruned_shared$Colonization630 == factor2)) * 0.623)
+ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
+trees <- round(ncol(pruned_shared) - 1) * ntree_multiplier
+tries <- round(sqrt(ncol(pruned_shared) - 1))
+rm(factor1, factor2, num1, num2, ntree_multiplier)
+pruned_rf <- randomForest(pruned_shared$Colonization630~., 
+                                  data=pruned_shared, importance=TRUE, replace=FALSE, 
+                                  do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
+rm(trees, tries)
+pruned_accuracy <- paste('Accuracy = ',as.character((100-round((median(pruned_rf$err.rate[,1])*100), 2))),'%',sep='')
 
 # Merge remaining important OTUs with taxonomy
 preabx_importances <- merge(preabx_importances, taxonomy, by='row.names', all.x=TRUE)
@@ -148,7 +155,7 @@ preabx_pvalues <- c()
 for (index in 1:ncol(colonized_preabx_shared)){
   preabx_pvalues[index] <- wilcox.test(cleared_preabx_shared[,index], colonized_preabx_shared[,index], exact=FALSE)$p.value
 }
-preabx_pvalues <- round(p.adjust(preabx_pvalues, method='BH'), 3)
+preabx_pvalues <- round(p.adjust(preabx_pvalues, method='holm'), 3)
 for (index in 1:length(preabx_pvalues)) {
   if (preabx_pvalues[index] == 0) {
     preabx_pvalues[index] <- '< 0.001 ***'
@@ -186,30 +193,30 @@ layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
 dotchart(preabx_importances$MDA, labels=rownames(preabx_importances),
          lcolor=NA, cex=1.2, color='black', 
-         xlab='', xlim=c(8,15), pch=19, lwd=3)
-segments(x0=rep(8, 10), y0=c(1:10), x1=rep(15, 10), y1=c(1:10), lty=2) # Dotted lines
+         xlab='', xlim=c(7,15), pch=19, lwd=3)
+segments(x0=rep(7, 10), y0=c(1:10), x1=rep(15, 10), y1=c(1:10), lty=2) # Dotted lines
 legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
 par(xaxt='s')
-axis(side=1, at=c(8:15), labels=c(0,9:15), cex.axis=1.2, tck=-0.025)
-axis.break(1, 8.5, style='slash')
+axis(side=1, at=c(7:15), labels=c(0,8:15), cex.axis=1.2, tck=-0.025)
+axis.break(1, 7.5, style='slash')
 mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-13.2, cex=1.7)
 
 # OTU abundance differences
-par(mar=c(3,19,1,1), xaxs='r', mgp=c(2,1,0))
+par(mar=c(3,20,1,1), xaxs='r', mgp=c(2,1,0))
 plot(1, type='n', ylim=c(0.8, (ncol(cleared_preabx_shared)*2)-0.8), xlim=c(0,3), 
-     ylab='', xlab='Abundance', xaxt='n', yaxt='n', cex.lab=1.4)
+     ylab='', xlab='Abundance (per 9000 sequences)', xaxt='n', yaxt='n', cex.lab=1.4)
 index <- 1
 for(i in colnames(cleared_preabx_shared)){
   stripchart(at=index+0.35, cleared_preabx_shared[,i], 
-             pch=21, bg='firebrick1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+             pch=21, bg='deeppink', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
   stripchart(at=index-0.35, colonized_preabx_shared[,i], 
-             pch=21, bg='dodgerblue1', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
+             pch=21, bg='darkblue', method='jitter', jitter=0.15, cex=1.7, lwd=0.5, add=TRUE)
   if (i != colnames(cleared_preabx_shared)[length(colnames(cleared_preabx_shared))]){
     abline(h=index+1, lty=2)
   }
-  segments(median(cleared_preabx_shared[,i]), index+0.6, median(cleared_preabx_shared[,i]), index+0.1, lwd=2.5) #adds line for median
-  segments(median(colonized_preabx_shared[,i]), index-0.6, median(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
+  segments(mean(cleared_preabx_shared[,i]), index+0.6, mean(cleared_preabx_shared[,i]), index+0.1, lwd=2.5) #adds line for median
+  segments(mean(colonized_preabx_shared[,i]), index-0.6, mean(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
   index <- index + 2
 }
 axis(side=1, at=c(0:3), label=c('0','10','100','1000'), cex.axis=1.2, tck=-0.02)
@@ -218,7 +225,7 @@ axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01)
 legend('topright', legend=c('Cleared', 'Colonized'),
-       pch=c(21, 21), pt.bg=c('firebrick1','dodgerblue1'), bg='white', pt.cex=1.7, cex=1.2)
+       pch=c(21, 21), pt.bg=c('deeppink','darkblue'), bg='white', pt.cex=1.7, cex=1.2)
 axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(preabx_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
 formatted_taxa <- lapply(1:nrow(preabx_importances), function(x) bquote(paste(.(preabx_importances$phylum[x]),'; ',italic(.(preabx_importances$genus[x])), sep='')))
 axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
