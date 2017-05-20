@@ -98,15 +98,20 @@ tries <- round(sqrt(ncol(cleared_colonized_preabx) - 1))
 rm(factor1, factor2, num1, num2, ntree_multiplier)
 
 # Run random forest and assess predictive value
-cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630~., 
+accuracies <- c()
+for (i in 1:100){
+  cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630~., 
                                   data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
+accuracies[i] <- (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))
+print(i)
+}
 rm(trees, tries)
+preabx_accuracy <- paste('Accuracy = ',as.character(median(accuracies)),'%',sep='')
 print(cleared_preabx_rf)
 
 # Retreive importance and overall error rate
 preabx_importances <- importance(cleared_preabx_rf, type=1)
-preabx_accuracy <- paste('Accuracy = ',as.character((100-round((median(cleared_preabx_rf$err.rate[,1])*100), 2))),'%',sep='')
 
 # Get accuracy of binning from pruned feature set
 factor1 <- as.vector(levels(pruned_shared$Colonization630))[1]
@@ -117,11 +122,17 @@ ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3
 trees <- round(ncol(pruned_shared) - 1) * ntree_multiplier
 tries <- round(sqrt(ncol(pruned_shared) - 1))
 rm(factor1, factor2, num1, num2, ntree_multiplier)
+accuracies <- c()
+for (i in 1:100){
 pruned_rf <- randomForest(pruned_shared$Colonization630~., 
                                   data=pruned_shared, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
+accuracies[i] <- (100-round((tail(pruned_rf$err.rate[,1], n=1)*100), 2))
+print(i)
+}
 rm(trees, tries)
-pruned_accuracy <- paste('Accuracy = ',as.character((100-round((median(pruned_rf$err.rate[,1])*100), 2))),'%',sep='')
+pruned_accuracy <- paste('Accuracy = ',as.character(median(accuracies)),'%',sep='')
+print(pruned_accuracy)
 
 # Merge remaining important OTUs with taxonomy
 preabx_importances <- merge(preabx_importances, taxonomy, by='row.names', all.x=TRUE)
@@ -199,7 +210,7 @@ legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
 par(xaxt='s')
 axis(side=1, at=c(7:15), labels=c(0,8:15), cex.axis=1.2, tck=-0.025)
 axis.break(1, 7.5, style='slash')
-mtext('median Decrease Accuracy', side=1, padj=1.8, cex=0.9)
+mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-13.2, cex=1.7)
 
 # OTU abundance differences
