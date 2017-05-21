@@ -5,8 +5,9 @@
 rm(list=ls())
 gc()
 
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 #read in the data 
-colonization<-read.table(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/Data_sheets/Colonization_RAG_Recips.txt", header=T)
+colonization<-read.table(file="Colonization_RAG_Recips.txt", header=T)
 
 
 # Load dependencies (code coppied from Matt Jenior) 
@@ -217,14 +218,14 @@ grid.draw(g3)
 #### MDS of D1 communites 
 #Read in required  data 
 #Read in filted and subsampled shared file this file has more data than is used for this analysis 
-otu.shared<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header = T)
+otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header = T)
 otu.shared$label<-NULL
 otu.shared$numOtus<-NULL
 #removes label and numOtus columns from the dataframe
 #reads in the table of all the samples from the adoptive transfer experiment 
-adoptrans.grps<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/2016_RAG_adoptivetransfer.grps.accnos", header = F)
+adoptrans.grps<-read.delim(file="2016_RAG_adoptivetransfer.grps.accnos", header = F)
 #reads in a file of metadata 
-meta.data<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_metadata.txt", header=T, row.names = 1)
+meta.data<-read.delim(file="Adoptivetransfer_metadata.txt", header=T, row.names = 1)
 
 
 #Pull out the data from the adoptive transfer experiment from the shared file 

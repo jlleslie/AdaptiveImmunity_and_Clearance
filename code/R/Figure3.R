@@ -16,17 +16,18 @@ for (dep in deps){
 }
 rm(dep)
 
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 #Read in the data 
 #shared file: this file has more data than is used for this analysis 
-otu.shared<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header = T)
+otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header = T)
 otu.shared$label<-NULL
 otu.shared$numOtus<-NULL
 #removes label and numOtus columns from the dataframe
 
 #reads in the table of all the samples from the adoptive transfer experiment 
-adoptrans.grps<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/2016_RAG_adoptivetransfer.grps.accnos", header = F)
+adoptrans.grps<-read.delim(file="2016_RAG_adoptivetransfer.grps.accnos", header = F)
 #reads in a file of metadata 
-meta.data<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_metadata.txt", header=T, row.names = 1)
+meta.data<-read.delim(file="Adoptivetransfer_metadata.txt", header=T, row.names = 1)
 
 #Pull out the data from the adoptive transfer experiment from the shared file 
 otu.shared.adoptrans<-otu.shared[otu.shared$Group %in% adoptrans.grps[,1], ]
@@ -174,7 +175,7 @@ grid.draw(g)
 
 # Figure 3B: D21 Comparing divesity between treatment croups 
 
-D21.shared<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_shared_adoptivetrans.0.03.filter.0.03.subsample.0.03.pick.shared")
+D21.shared<-read.delim(file="D21_shared_adoptivetrans.0.03.filter.0.03.subsample.0.03.pick.shared")
 #reads in the full D21 sample shared file
 row.names(D21.shared) = D21.shared$Group
 D21.shared$label <- NULL
@@ -268,13 +269,13 @@ grid.draw(g.3b)
 ######Plot Using Log Transformed Data NOT Relative Abundace ####################
 #Using lefse file without Samples from 1443 and 1444 because they are unclear phenotype interms of adaptive Immunity
 #Read in lefse result
-lefse<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.filter.0.03.subsample.0.03.pick.0.03.lefse_summary", header=T)
+lefse<-read.delim(file="D21_adoptivetrans.no1433.1444.filter.0.03.subsample.0.03.pick.0.03.lefse_summary", header=T)
 lefse.otus.df<- na.omit(lefse[lefse$LDA >="2",])
 #removes all the OTUS associaed with empty values and LDA<2
 lefse.otus.df<-lefse.otus.df[order(-lefse.otus.df$LDA), ]
 #orders the dataframe by LDA value
 lefse.otus<-lefse.otus.df[1:10,]
-D21.shared<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.filter.0.03.subsample.0.03.pick.shared")
+D21.shared<-read.delim(file="D21_adoptivetrans.no1433.1444.filter.0.03.subsample.0.03.pick.shared")
 #reads in the full D21 sample shared file
 row.names(D21.shared) = D21.shared$Group
 D21.shared$label <- NULL
@@ -286,7 +287,7 @@ D21.shared.log<- log10(D21.shared + 1)
 lefse.D21.shared.log<-D21.shared.log[ ,as.vector(lefse.otus$OTU)]
 #filters shared file down to top 10 OTUs with highest LDA values
 
-Igg.stat<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21.IgGposneg.no1433.1444.txt",header = F, row.names = 1)
+Igg.stat<-read.delim(file="D21.IgGposneg.no1433.1444.txt",header = F, row.names = 1)
 #read in file with Igg status
 lefse.D21.shared.log.meta<-merge(Igg.stat,lefse.D21.shared.log,  by= 'row.names')
 row.names(lefse.D21.shared.log.meta)=lefse.D21.shared.log.meta$Row.names
@@ -330,7 +331,7 @@ make.tax<-function(taxonomy){
   return(new.taxonomy)
 }
 
-tax<-read.table(file='/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/CDIclear.final.0.03.cons.taxonomy', header=TRUE)
+tax<-read.table(file='CDIclear.final.0.03.cons.taxonomy.copy', header=TRUE)
 taxa<-make.tax(taxonomy=tax)
 taxa$Size<-NULL
 taxa$Taxonomy<-NULL

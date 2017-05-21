@@ -1,17 +1,24 @@
 #Analysis for "The role of adaptive immunity in Clostridium difficile clearance in a murine model of infection"
 # Figure 1: Results from adoptive transfer experiment
 
+# Start with clean environment
+rm(list=ls())
+gc()
+
 #load packages used for all figure 2 plots 
 library(ggplot2)
 library(grid)
 library(gtable)
 library(gridExtra)
 
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+#change this to where your file is located 
+
 ## Immune response to C. difficile (anti-toxin A IgG titers)
 # Data used to gernate figure 2A and 2C 
 
 #read in the data 
-antitoxin<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/Data_sheets/AntitoxinA_IgGtiter_5ugmlcoat_Apri142017.txt")
+antitoxin<-read.delim(file="AntitoxinA_IgGtiter_5ugmlcoat_Apri142017.txt")
 # Any sample that did not have a detectable titer was given a value of 0 
 # One mouse did not have sample to test and therefore got a value of NA 
 
@@ -204,7 +211,7 @@ grid.draw(g1)
 
 ## Measurement of Total IgG in mice at time of harvest 
 #read in the data 
-IgG<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/Data_sheets/TotalIgG_April_5_2017.txt")
+IgG<-read.delim(file="TotalIgG_April_5_2017.txt", header = T)
 
 #Statistics 
 #Testing if values from each group are from distint distributions

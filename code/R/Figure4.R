@@ -15,16 +15,17 @@ for (dep in deps){
 }
 rm(dep)
 
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 #Figure 4A
 #Experiment outline drawn in illustrator 
 
 
 #Figure 4B 
 #Analysis of Co-housing Experiment
-shared<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header=T)
+shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header=T)
 shared$label<-NULL
 shared$numOtus<-NULL
-meta.data<-read.delim(file="/Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adaptiveimmuneclear_noD40.42_metadata.txt", header=T, row.names = 1)
+meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.txt", header=T, row.names = 1)
 meta.data.coho<-meta.data[meta.data$Year=="2014" & meta.data$Treatment_1=="630",]
 meta.data.coho.dneg15<-meta.data.coho[meta.data.coho$Day=="-15" & meta.data.coho$Mouse!="181",]
 #Exluded mouse 18-1 because it died during the course of the experiment 
@@ -84,7 +85,7 @@ print(median(anosim_pvalue))
 
 #Figure 4C
 #Colonization overtime
-cfutime_data<-read.table(file='/Users/Jhansi1/Desktop/Intraspecific_Competition/data/Colonization_Overtime_630_Allexperiments.txt', header=TRUE)
+cfutime_data<-read.table(file='Colonization_Overtime_630_Allexperiments_copy.txt', header=TRUE)
 #Note the data is reported such that if no colonies were seen on the 10^-2 plate, that sample was reported as having 100 CFU/g feces ie the LOD 
 
 ##2014 Exeperiment data, RAG and WT mice
@@ -180,7 +181,7 @@ wilcox.test(d40.f, d40.m)
 
 #Figure 4D  CFU for at end of experiment by genotype and group
 #Colonization overtime
-cfutime_data<-read.table(file='/Users/Jhansi1/Desktop/Intraspecific_Competition/data/Colonization_Overtime_630_Allexperiments.txt', header=TRUE)
+cfutime_data<-read.table(file='Colonization_Overtime_630_Allexperiments_copy.txt', header=TRUE)
 #Note the data is reported such that if no colonies were seen on the 10^-2 plate, that sample was reported as having 100 CFU/g feces ie the LOD 
 
 ##2014 Exeperiment data, RAG and WT mice
@@ -225,3 +226,4 @@ d1 = d+ labs(y = " CFU per Gram Feces")
 d2 = d1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
 d3 = d2 +  scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 d3
+
