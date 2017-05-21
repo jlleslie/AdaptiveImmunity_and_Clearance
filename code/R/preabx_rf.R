@@ -32,9 +32,10 @@ filter_table <- function(data) {
 }
 
 # Define data files
-metadata <- '~/Desktop/Repositories/clearance_2017/data/Adaptiveimmuneclear_metadata_noD40.42.txt'
-shared <- '~/Desktop/Repositories/clearance_2017/data/Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared'
-taxonomy <- '~/Desktop/Repositories/clearance_2017/data/clearance.formatted.taxonomy'
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.txt'
+shared <- 'Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared'
+taxonomy <- 'clearance.formatted.taxonomy'
 
 # Define output file
 plot_file <- '~/Desktop/Repositories/clearance_2017/figures/preabx_RF_plot.pdf'
@@ -72,8 +73,8 @@ rm(metadata)
 
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
-cleared_colonized <- subset(shared, Colonization630 != 'uncolonized')
-cleared_colonized$Colonization630 <- factor(cleared_colonized$Colonization630)
+cleared_colonized <- subset(shared, Colonization630_stat != 'uncolonized')
+cleared_colonized$Colonization630_stat <- factor(cleared_colonized$Colonization630_stat)
 cleared_colonized_preabx <- subset(cleared_colonized, Day %in% c(-15,-12))
 cleared_colonized_preabx$Co_Housed <- NULL
 cleared_colonized_preabx$Day <- NULL
@@ -82,16 +83,16 @@ rm(cleared_colonized)
 rm(shared)
 
 # Subset to most informative OTUs from previous RF analysis
-pruned_shared <- cleared_colonized_preabx[, c('Colonization630','Otu0052', 'Otu0093', 'Otu0026')]
+pruned_shared <- cleared_colonized_preabx[, c('Colonization630_stat','Otu0052', 'Otu0093', 'Otu0026')]
 
 #--------------------------------------------------------------------#
 
 # preabx time point
 # Determine optimal ntree and mtry
-factor1 <- as.vector(levels(cleared_colonized_preabx$Colonization630))[1]
-factor2 <- as.vector(levels(cleared_colonized_preabx$Colonization630))[2]
-num1 <- round(length(which(cleared_colonized_preabx$Colonization630 == factor1)) * 0.623)
-num2 <- round(length(which(cleared_colonized_preabx$Colonization630 == factor2)) * 0.623)
+factor1 <- as.vector(levels(cleared_colonized_preabx$Colonization630_stat))[1]
+factor2 <- as.vector(levels(cleared_colonized_preabx$Colonization630_stat))[2]
+num1 <- round(length(which(cleared_colonized_preabx$Colonization630_stat == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_preabx$Colonization630_stat == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
 trees <- round(ncol(cleared_colonized_preabx) - 1) * ntree_multiplier
 tries <- round(sqrt(ncol(cleared_colonized_preabx) - 1))
@@ -100,7 +101,7 @@ rm(factor1, factor2, num1, num2, ntree_multiplier)
 # Run random forest and assess predictive value
 accuracies <- c()
 #for (i in 1:100){
-  cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630~., 
+  cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630_stat~., 
                                   data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 #accuracies[i] <- (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))
@@ -115,10 +116,10 @@ print(cleared_preabx_rf)
 preabx_importances <- importance(cleared_preabx_rf, type=1)
 
 # Get accuracy of binning from pruned feature set
-factor1 <- as.vector(levels(pruned_shared$Colonization630))[1]
-factor2 <- as.vector(levels(pruned_shared$Colonization630))[2]
-num1 <- round(length(which(pruned_shared$Colonization630 == factor1)) * 0.623)
-num2 <- round(length(which(pruned_shared$Colonization630 == factor2)) * 0.623)
+factor1 <- as.vector(levels(pruned_shared$Colonization630_stat))[1]
+factor2 <- as.vector(levels(pruned_shared$Colonization630_stat))[2]
+num1 <- round(length(which(pruned_shared$Colonization630_stat == factor1)) * 0.623)
+num2 <- round(length(which(pruned_shared$Colonization630_stat == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
 trees <- round(ncol(pruned_shared) - 1) * ntree_multiplier
 tries <- round(sqrt(ncol(pruned_shared) - 1))
@@ -153,11 +154,11 @@ cleared_preabx_shared <- cleared_colonized_preabx[, c(1,which(colnames(cleared_c
 rm(cleared_colonized_preabx)
 
 # Break into experimental groups
-colonized_preabx_shared <- subset(cleared_preabx_shared, Colonization630 == 'colonized')
-colonized_preabx_shared$Colonization630 <- NULL
+colonized_preabx_shared <- subset(cleared_preabx_shared, Colonization630_stat == 'colonized')
+colonized_preabx_shared$Colonization630_stat <- NULL
 colonized_preabx_shared <- colonized_preabx_shared[,match(rownames(preabx_importances), colnames(colonized_preabx_shared))] 
-cleared_preabx_shared <- subset(cleared_preabx_shared, Colonization630 == 'cleared')
-cleared_preabx_shared$Colonization630 <- NULL
+cleared_preabx_shared <- subset(cleared_preabx_shared, Colonization630_stat == 'cleared')
+cleared_preabx_shared$Colonization630_stat <- NULL
 cleared_preabx_shared <- cleared_preabx_shared[,match(rownames(preabx_importances), colnames(cleared_preabx_shared))]
 
 #--------------------------------------------------------------------#
