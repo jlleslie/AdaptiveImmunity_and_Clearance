@@ -93,6 +93,10 @@ cfutime_data<-cfutime_data[cfutime_data$Experiment == "2014",]
 
 #Pulls out Mice that were infected 
 cfutime_data.infected<-cfutime_data[cfutime_data$Treatment_1 =="630",]
+#Replace the 100 in the mice that actually had undectable levles with LOD/squarroot of 2
+#the LOD is 100 
+fill.in.lod<-100/sqrt(2) #fil.in.lod = 70.71068
+cfutime_data.infected$CFU_g<-replace(cfutime_data.infected$CFU_g,cfutime_data.infected$CFU_g==100,fill.in.lod)
 
 
 ## Modified from soure of function: http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/
@@ -129,11 +133,6 @@ summaryMED<-function(data=NULL, measurevar, metadata=NULL, na.rm=FALSE, .drop=TR
 cfutime_data.infected.med<-summaryMED(cfutime_data.infected, measurevar="CFU_g", metadata=c("Cage","Day"), na.rm=TRUE)
 cfutime_data.infected.med$Genotype<-c(rep("RAG",16), rep("WT",16))
 #add genotype column 
-
-#Replace the 100 in the mice that actually had undectable levles with LOD/squarroot of 2
-#the LOD is 100 
-fill.in.lod<-100/sqrt(2) #fil.in.lod = 70.71068
-cfutime_data.infected.med$CFU_g<-replace(cfutime_data.infected.med$CFU_g,cfutime_data.infected.med$CFU_g==100,fill.in.lod)
 
 
 col=c("16"="#61bfee", "978"="#61bfee","18"="#bb5fa1","977" ="#bb5fa1")
