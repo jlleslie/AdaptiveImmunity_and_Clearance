@@ -46,9 +46,10 @@ donor.col$CFU_g<-replace(donor.col$CFU_g,donor.col$CFU_g== 0,fill.in.lod)
 
 ##Determine the Median and IQR for CFU grouped by Cage
 donor.col.med<-summaryMED(donor.col, measurevar="CFU_g", metadata=c("Cage","Day"), na.rm=TRUE)
-
+colors.don<-c("1500"="grey", "1502"="black")
 donor.plot<-ggplot(donor.col.med, aes(x=Day, y= CFU_g, group=Cage, color=factor(Cage)))+  
   geom_point(size=6)+
+  scale_color_manual(values = colors.don) +
   geom_errorbar(aes(ymin=firstquart.25per, ymax=thirdquart.75per), width=1, size=0.9)+
   geom_line(size=0.9) 
 
