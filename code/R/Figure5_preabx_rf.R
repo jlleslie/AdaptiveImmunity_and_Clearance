@@ -15,8 +15,8 @@ for (dep in deps){
 rm(dep)
 
 # Define data files
-#setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-setwd("~/Desktop/Repositories/clearance_2017/data")
+setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+#setwd("~/Desktop/Repositories/clearance_2017/data")
 metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
 shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
