@@ -22,7 +22,7 @@ setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 
 #Figure 4B 
 #Analysis of Co-housing Experiment
-shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header=T)
+shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
 shared$label<-NULL
 shared$numOtus<-NULL
 meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.txt", header=T, row.names = 1)
@@ -37,7 +37,7 @@ coho.shared$Group=NULL
 #Making MDS plot of groups of co-housed mice 
 #Generate the MDS 
 metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$stress
-#Stress = 0.1730935
+#Stress =  0.1864309 
 Dneg15_nmds <- metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$points
 Dneg15_nmds_meta<-merge(Dneg15_nmds,meta.data, by= 'row.names')
 row.names(Dneg15_nmds_meta)<-Dneg15_nmds_meta$Row.names
@@ -54,7 +54,7 @@ Dneg15nmds_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$
 
 #Plotting the values 
 plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
-     xlab ="MDS axis 1", ylab ="MDS axis 2")
+     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
 axis(side = 2, col="grey80", las=1)
 axis(side = 1, col="grey80", las=1)
@@ -62,12 +62,12 @@ points(pts.A, pch=21, bg='#61bfee', cex=2)
 points(pts.B, pch=21, bg='#bb5fa1', cex=2)
 segments(x0=pts.B$MDS1, y0=pts.B$MDS2, x1=Dneg15nmds_centroids[2,2], y1=Dneg15nmds_centroids[2,3], col='gray30')
 segments(x0=pts.A$MDS1, y0=pts.A$MDS2, x1=Dneg15nmds_centroids[1,2], y1=Dneg15nmds_centroids[1,3], col='gray30')
-points(0.31,0.25, pch=21, bg='#61bfee', cex=2)
+points(0.31,0.26, pch=21, bg='#61bfee', cex=2)
 points(0.31,0.23, pch=21, bg='#bb5fa1', cex=2)
-text(0.31, 0.25, labels = c("Group A"), pos=2)
+text(0.31, 0.26, labels = c("Group A"), pos=2)
 text(0.31, 0.23, labels = c("Group B"), pos=2)
-text(0.31,-0.25, labels = c("p = 0.041"), pos=2)
-text(0.31,-0.23, labels = c("R: 0.1756 "), pos=2)
+text(0.31,-0.26, labels = c("p = 0.046"), pos=2)
+text(0.31,-0.23, labels = c("R: 0.161 "), pos=2)
 #for the ANOSIM you need to assign samples to either group A (cage 16 and 978) or B (18 and 977) 
 coho.shared$Cage<-sapply(strsplit(row.names(coho.shared), ".D"), "[", 1)
 coho.shared$Cage<-c(rep("A",4), rep("B",8), rep("A",5))
@@ -76,12 +76,12 @@ coho.shared$Cage<-c(rep("A",4), rep("B",8), rep("A",5))
 #Loop runs anosim itteratively 100 times and reports the median value 
 anosim_pvalue <- c()
 for (i in 1:100){
-  anosim_pvalue[i] <- anosim(coho.shared[,1:1319], coho.shared$Cage, permutations=999, distance='bray')$signif
+  anosim_pvalue[i] <- anosim(coho.shared[,1:660], coho.shared$Cage, permutations=999, distance='bray')$signif
   print(i)
 }
 print(median(anosim_pvalue))
-#ANOSIM statistic R: 0.1756 
-#Significance:  0.042
+#ANOSIM statistic R: 0.161 
+#Significance:  0.046
 
 #Figure 4C
 #Colonization overtime
