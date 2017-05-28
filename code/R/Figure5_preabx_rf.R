@@ -14,31 +14,15 @@ for (dep in deps){
 }
 rm(dep)
 
-# Filter out columns that have values in at least 3 samples (ignores first column if needed)
-filter_table <- function(data) {
-  drop <- c()
-  if (class(data[,1]) != 'character') {
-    if (sum(data[,1] != 0) < 3) {
-      drop <- c(drop, colnames(data)[1])
-    }
-  }
-  for (index in 2:ncol(data)) {
-    if (sum(data[,index] != 0) < 3) {
-      drop <- c(drop, colnames(data)[index])
-    }
-  }
-  filtered_data <- data[,!(colnames(data) %in% drop)]
-  return(filtered_data)
-}
-
 # Define data files
-setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.txt'
-shared <- 'Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared'
+#setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+setwd("~/Desktop/Repositories/clearance_2017/data")
+metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
+shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
 
 # Define output file
-plot_file <- '~/Desktop/Repositories/clearance_2017/figures/preabx_RF_plot.pdf'
+plot_file <- '~/Desktop/Repositories/clearance_2017/figures/Figure_5_RF.pdf'
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -73,7 +57,7 @@ rm(metadata)
 
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
-cleared_colonized <- subset(shared, Colonization630_stat != 'uncolonized')
+cleared_colonized <- subset(shared, shared$Colonization630_stat != 'uncolonized')
 cleared_colonized$Colonization630_stat <- factor(cleared_colonized$Colonization630_stat)
 cleared_colonized_preabx <- subset(cleared_colonized, Day %in% c(-15,-12))
 cleared_colonized_preabx$Co_Housed <- NULL
@@ -100,16 +84,16 @@ rm(factor1, factor2, num1, num2, ntree_multiplier)
 
 # Run random forest and assess predictive value
 accuracies <- c()
-#for (i in 1:100){
-  cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630_stat~., 
+for (i in 1:100){
+cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630_stat~.,
                                   data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
-#accuracies[i] <- (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))
-#print(i)
-#}
+accuracies[i] <- (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))
+print(i)
+}
 rm(trees, tries)
-#preabx_accuracy <- paste('Accuracy = ',as.character(median(accuracies)),'%',sep='')
-preabx_accuracy <- 'Accuracy = 76.92%'
+preabx_accuracy <- paste('Accuracy = ',as.character(median(accuracies)),'%',sep='')
+#preabx_accuracy <- 'Accuracy = 76.92%'
 print(cleared_preabx_rf)
 
 # Retreive importance and overall error rate
@@ -134,6 +118,7 @@ print(i)
 }
 rm(trees, tries)
 pruned_accuracy <- paste('Accuracy = ',as.character(median(accuracies)),'%',sep='')
+print(pruned_rf)
 print(pruned_accuracy)
 
 # Merge remaining important OTUs with taxonomy
@@ -206,19 +191,20 @@ layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
 dotchart(preabx_importances$MDA, labels=rownames(preabx_importances),
          lcolor=NA, cex=1.7, color='black', 
-         xlab='', xlim=c(7,15), pch=19, lwd=3)
-segments(x0=rep(7, 10), y0=c(1:10), x1=rep(15, 10), y1=c(1:10), lty=2) # Dotted lines
+         xlab='', xlim=c(2,14), pch=19, lwd=3)
+segments(x0=rep(2, 10), y0=c(1:10), x1=rep(14, 10), y1=c(1:10), lty=2) # Dotted lines
 legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
 par(xaxt='s')
-axis(side=1, at=c(7:15), labels=c(0,8:15), cex.axis=1.2, tck=-0.025)
-axis.break(1, 7.5, style='slash')
+axis(side=1, at=c(2,4,6,8,10,12,14), labels=c(0,4,6,8,10,12,14), cex.axis=1.2, tck=-0.025)
+axis.break(1, 3, style='slash')
 mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
 mtext('A', side=2, line=2, las=2, adj=1, padj=-13.2, cex=1.7)
 
 # OTU abundance differences
+# Abundance (per 10000 sequences)
 par(mar=c(3,20,1,1), xaxs='r', mgp=c(2,1,0))
-plot(1, type='n', ylim=c(0.8, (ncol(cleared_preabx_shared)*2)-0.8), xlim=c(0,3), 
-     ylab='', xlab='Abundance (per 10000 sequences)', xaxt='n', yaxt='n', cex.lab=1.4)
+plot(1, type='n', ylim=c(0.8, (ncol(cleared_preabx_shared)*2)-0.8), xlim=c(0,4), 
+     ylab='', xlab='Relative Abundance %', xaxt='n', yaxt='n', cex.lab=1.4)
 index <- 1
 for(i in colnames(cleared_preabx_shared)){
   stripchart(at=index+0.35, cleared_preabx_shared[,i], 
@@ -232,11 +218,12 @@ for(i in colnames(cleared_preabx_shared)){
   segments(median(colonized_preabx_shared[,i]), index-0.6, median(colonized_preabx_shared[,i]), index-0.1, lwd=2.5)
   index <- index + 2
 }
-axis(side=1, at=c(0:3), label=c('0','10','100','1000'), cex.axis=1.2, tck=-0.02)
+axis(side=1, at=c(0:4), label=c('0','0.1','1','10','100'), cex.axis=1.2, tck=-0.02)
 minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98)
 axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01)
+axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01)
 legend('topright', legend=c('Cleared', 'Colonized'),
        pch=c(21, 21), pt.bg=c('deeppink','darkblue'), bg='white', pt.cex=2, cex=1.2)
 axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(preabx_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
