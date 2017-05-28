@@ -83,6 +83,35 @@ print(median(anosim_pvalue))
 #ANOSIM statistic R: 0.161 
 #Significance:  0.046
 
+
+##MDS by genoytpe 
+
+
+#pulling out points for each co-housing grouping 
+pts.RAG<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="16" | Dneg15_nmds_meta$Cage =="18", 1:2]
+pts.WT<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="978" |  Dneg15_nmds_meta$Cage =="977", 1:2]
+coho.shared$Cage=coho.shared$Genotype
+coho.shared$Genotype<-c(rep("RAG1KO",8), rep("WT",9))
+RAG<- Dneg15.cent.nmds[Dneg15.cent.nmds$Genotype=="RAG1KO", 1:2]
+Dneg15nmdsgeno_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$MDS2)~ Dneg15.cent.nmds$Genotype, data=Dneg15.cent.nmds, mean)
+#Plotting the values 
+plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
+     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
+box(which = "plot", lty = "solid", col ="grey80", lwd=5)
+axis(side = 2, col="grey80", las=1)
+axis(side = 1, col="grey80", las=1)
+points(pts.RAG, pch=21, bg='white', cex=2)
+points(pts.WT, pch=21, bg='black', cex=2)
+segments(x0=pts.WT$MDS1, y0=pts.WT$MDS2, x1=Dneg15nmdsgeno_centroids[2,2], y1=Dneg15nmdsgeno_centroids[2,3], col='gray30')
+segments(x0=pts.RAG$MDS1, y0=pts.RAG$MDS2, x1=Dneg15nmdsgeno_centroids[1,2], y1=Dneg15nmdsgeno_centroids[1,3], col='gray30')
+anosim_pvalue <- c()
+for (i in 1:100){
+  anosim_pvalue[i] <- anosim(coho.shared[,1:660], coho.shared$Genotype, permutations=999, distance='bray')$signif
+  print(i)
+}
+print(median(anosim_pvalue))
+
+
 #Figure 4C
 #Colonization overtime
 cfutime_data<-read.table(file='Colonization_Overtime_630_Allexperiments_copy.txt', header=TRUE)
