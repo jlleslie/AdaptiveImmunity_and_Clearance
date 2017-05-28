@@ -6,6 +6,7 @@ setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 library(ggplot2)
 library(grid)
 library(scales)
+library(vegan)
 
 # Modified from soure of function: http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/
 ## Gives count, first quartile, median and thrid quartile 
@@ -102,7 +103,68 @@ two.B  = two.B + labs(y = "Serum IgG ng/ml")
 two.B 
 
 
-#Supp figure: Colonization of other mice included in Random Forest 
+
+#Supp figure3: MDS of RAG and WT mice co-housed (figure 4B, but analyzed by genotype )
+shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
+shared$label<-NULL
+shared$numOtus<-NULL
+meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.txt", header=T, row.names = 1)
+meta.data.coho<-meta.data[meta.data$Year=="2014" & meta.data$Treatment_1=="630",]
+meta.data.coho.dneg15<-meta.data.coho[meta.data.coho$Day=="-15" & meta.data.coho$Mouse!="181",]
+#Exluded mouse 18-1 because it died during the course of the experiment 
+samples<-row.names(meta.data.coho.dneg15)
+coho.shared<-shared[shared$Group %in% samples,]
+row.names(coho.shared)<-coho.shared$Group
+coho.shared$Group=NULL
+
+#Making MDS plot of groups of co-housed mice 
+#Generate the MDS 
+metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$stress
+#Stress =  0.1864309 
+Dneg15_nmds <- metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$points
+Dneg15_nmds_meta<-merge(Dneg15_nmds,meta.data, by= 'row.names')
+row.names(Dneg15_nmds_meta)<-Dneg15_nmds_meta$Row.names
+Dneg15_nmds_meta$Row.names<-NULL
+#reassigns row.names 
+##MDS by genoytpe 
+
+
+#pulling out points for each co-housing grouping 
+pts.RAG<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="16" | Dneg15_nmds_meta$Cage =="18", 1:2]
+pts.WT<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="978" |  Dneg15_nmds_meta$Cage =="977", 1:2]
+coho.shared$Cage=coho.shared$Genotype
+coho.shared$Genotype<-c(rep("RAG1KO",8), rep("WT",9))
+Dneg15.cent.nmds<-Dneg15_nmds_meta
+RAG<- Dneg15.cent.nmds[Dneg15.cent.nmds$Genotype=="RAG1KO", 1:2]
+Dneg15nmdsgeno_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$MDS2)~ Dneg15.cent.nmds$Genotype, data=Dneg15.cent.nmds, mean)
+#Plotting the values 
+plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
+     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
+box(which = "plot", lty = "solid", col ="grey80", lwd=5)
+axis(side = 2, col="grey80", las=1)
+axis(side = 1, col="grey80", las=1)
+points(pts.RAG, pch=21, bg='white', cex=2)
+points(pts.WT, pch=21, bg='black', cex=2)
+segments(x0=pts.WT$MDS1, y0=pts.WT$MDS2, x1=Dneg15nmdsgeno_centroids[2,2], y1=Dneg15nmdsgeno_centroids[2,3], col='gray30')
+segments(x0=pts.RAG$MDS1, y0=pts.RAG$MDS2, x1=Dneg15nmdsgeno_centroids[1,2], y1=Dneg15nmdsgeno_centroids[1,3], col='gray30')
+points(0.31,0.26, pch=21, bg='white', cex=2)
+points(0.31,0.23, pch=21, bg='black', cex=2)
+text(0.31, 0.26, labels = c("RAG1KO"), pos=2)
+text(0.31, 0.23, labels = c("WT"), pos=2)
+text(0.31,-0.16, labels = c("p = 0.085"), pos=2)
+text(0.31,-0.13, labels = c("R: 0.1224"), pos=2)
+
+
+#Stats
+anosim_pvalue <- c()
+for (i in 1:100){
+  anosim_pvalue[i] <- anosim(coho.shared[,1:660], coho.shared$Genotype, permutations=999, distance='bray')$signif
+  print(i)
+}
+print(median(anosim_pvalue))
+
+
+#Supp figure 4: Colonization of other mice included in Random Forest 
 
 #Colonization WT 2013 Experiment
 ###Read in the data for all experiments 
@@ -157,4 +219,72 @@ SB1  = SB + labs(y = expression(paste(Log[10], " CFU ", "per Gram Feces")))
 SB2 = SB1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
 SB3 = SB2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 SB3
+
+
+#Supp Figure 5: Relative Abundace of OTU 3(Akkermansia)
+
+
+shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared")
+shared$label=NULL
+shared$numOtus=NULL
+shared$Total.seqs=apply(shared[,2:419], 1, sum)
+shared$RelAbund.OTU3= (shared[,4]/shared$Total.seqs*100)
+
+shared.OTU3= shared[ ,c(1,421)]
+row.names(shared.OTU3)=shared.OTU3$Group
+shared.OTU3$Group = NULL
+shared.OTU3$Cage=sapply(strsplit(row.names(shared.OTU3), ".D"), "[", 1)
+shared.OTU3$Mouse=sapply(strsplit(row.names(shared.OTU3), "D."), "[", 1)
+shared.OTU3$Day=sapply(strsplit(row.names(shared.OTU3), "D"), "[", 2)
+
+#Abudance of OTU3 Akkermansia D21 post infection 
+shared.OTU3.D21<-shared.OTU3[shared.OTU3$Day=="21",]
+treament.metadata<-read.delim(file="D21.IgGposneg.txt",header = F, row.names = 1)
+D21.data<- merge(treament.metadata,shared.OTU3.D21, by='row.names')
+
+plot.D21<-ggplot(D21.data, aes(x=V2, y=RelAbund.OTU3, fill=V2)) +
+  geom_boxplot() + theme_bw()
+igg.pos<-D21.data[D21.data$V2 =="Splenocytes_IgG_positive",3]
+splen.igg.neg<-D21.data[D21.data$V2 =="Splenocytes_IgG_negative",3]
+veh<-D21.data[D21.data$V2 =="Vehicle_IgG_negative",3]
+plot.D21
+wilcox.test(splen.igg.neg,igg.pos)
+#data:  splen.igg.neg and igg.pos
+#W = 9, p-value = 0.5508
+wilcox.test(splen.igg.neg,veh)
+#data:  splen.igg.neg and veh
+#W = 0, p-value = 0.07143
+wilcox.test(igg.pos,veh)
+#data:  igg.pos and veh
+#W = 12, p-value = 0.0199
+#Correcting P-values for mutiple comparisons
+recip_pvals<-c(0.008087,0.008087, NA)
+round(p.adjust(recip_pvals, method = "BH"),3)
+
+
+
+#Abudance of OTU3 Akkermansia before any treatment 
+shared.OTU3.preabx<-shared.OTU3[shared.OTU3$Day=="neg12",]
+shared.OTU3.preabx$Group<-c(rep("B",1 ), rep("A",1 ), rep("B",4 ), rep("A",1 ), rep("C",2),rep("B",3 ),rep("C",1), rep("B",3 ) )
+#since at D-12 none of the mice have been treated with anything, I added random groups A-C to each mouse
+#where:
+# group A are the mice that will evenutally be Splenocytes_IgG_negative
+# group B are the mice that will evenutally be Splenocytes_IgG_positive
+# group C are the mice that will evenutally be Vehicle_IgG_negative
+
+plot.Preabx<-ggplot(shared.OTU3.preabx,aes(x=Group, y=RelAbund.OTU3, fill=Group)) +
+  geom_boxplot() + scale_y_continuous(limits = c(0,50)) + theme_bw()
+plot.Preabx
+A<-shared.OTU3.preabx[shared.OTU3.preabx$Group =="A",1]
+B<-shared.OTU3.preabx[shared.OTU3.preabx$Group =="B",1]
+C<-shared.OTU3.preabx[shared.OTU3.preabx$Group =="C",1]
+wilcox.test(A,B)
+#data:  A and B
+#W = 13, p-value = 0.7669
+wilcox.test(A,C)
+#data:  A and C
+#W = 5, p-value = 0.4
+wilcox.test(B,C)
+#data:  B and C
+#W = 26, p-value = 0.1607
 
