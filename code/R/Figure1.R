@@ -9,7 +9,7 @@ gc()
 library(ggplot2)
 library(grid)
 library(gtable)
-library(gridExtra)
+
 
 setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 #change this to where your file is located 
@@ -142,7 +142,7 @@ wilcox.test(rec_splen.infect_AntiAigg, rec_splen.uninfect_AntiAigg,exact=F)
 #alternative hypothesis: true location shift is not equal to 0
 
 #Correcting P-values for mutiple comparisons
-recip_pvals<-c(0.008087,0.008087)
+recip_pvals<-c(0.008087,0.008087, NA)
 round(p.adjust(recip_pvals, method = "BH"),3)
 # Antitoxin A titer in mice  that recived splenocytes from infected donors vs mice that got vehicle: 0.008
 # Antitoxin A titer in mice that recived splenocytes from infected donors vs uninfected donors:  0.008 
@@ -318,25 +318,6 @@ g = ggplotGrob(two.B)
 g$layout$clip[g$layout$name=="panel"] <- "off"
 grid.draw(g)
 
-############Plotting as a multipannel figures 
-library("gridExtra")
-
-a.1<-textGrob("A", hjust=0, vjust=0, gp = gpar(fontface = 2))
-b.1<-textGrob("B", hjust=0, vjust=0, gp = gpar(fontface = 2))
-c.1<-textGrob("C", hjust=0, vjust=0, gp = gpar(fontface = 2))
-
-
-
-
-lay2 <- rbind(c(4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6),
-              c(4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6),
-              c(4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6))
-          
-              
-
-
-grid.arrange(g2,g,g1, layout_matrix=lay2)
-##the multipannel figure was saved as a pdf and then opened in  adobe illustrator to redo the labels on the x axis and add in the experiment outline 
 
 
 

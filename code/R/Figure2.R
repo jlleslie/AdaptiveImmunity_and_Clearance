@@ -55,18 +55,20 @@ colonization.D26<-colonization[colonization$Day == "26", ]
 #Remove mouse 143_3 and 144_4, mice that got splenocytes but didn't develope IgG (from both colonization and col D26 data frames)
 colonization.no1433.1444<-colonization[colonization$Mouse!="143_3" &colonization$Mouse!="144_4",]
 colonization.D26.no1433.1444<-colonization.D26[colonization.D26$Mouse!="143_3" &colonization.D26$Mouse!="144_4",]
+#to use if you want to remove the two mice that didn't develope IgG 
+
 
 #Replace the 0 in the mice that had undectable levles with LOD/squarroot of 2
 #the LOD is 100 
 fill.in.lod<-100/sqrt(2) #fil.in.lod = 70.71068
-colonization.D26.no1433.1444$CFU_g<-replace(colonization.D26.no1433.1444$CFU_g,colonization.D26.no1433.1444$CFU_g==0,fill.in.lod)
+colonization.D26$CFU_g<-replace(colonization.D26$CFU_g,colonization.D26$CFU_g==0,fill.in.lod)
 
 #Testing if values from each group are from distint distributions
 #Pull out CFU/g  measured in recpient mice that got splenocytes from infected donors
-col.spleninfect<-colonization.D26.no1433.1444[colonization.D26.no1433.1444$Treatment_2=="infected_splenocytes",]
+col.spleninfect<-colonization.D26[colonization.D26$Treatment_2=="infected_splenocytes",]
 col.spleninfect_cfu<-c(col.spleninfect$CFU_g)
 #Pull out CFU/g  measured in recpient mice that got splenocytes from uninfected donors 
-col.splenmock<-colonization.D26.no1433.1444[colonization.D26.no1433.1444$Treatment_2=="mock_splenocytes",]
+col.splenmock<-colonization.D26[colonization.D26$Treatment_2=="mock_splenocytes",]
 col.splenmock_cfu<-c(col.splenmock$CFU_g)
 #Pull out CFU/g  measured in recpient mice that got splenocytes from uninfected donors 
 col.vehicle<-colonization.D26[colonization.D26$Treatment_2=="vehicle",]
@@ -74,34 +76,35 @@ col.vehicle_cfu<-c(col.vehicle$CFU_g)
 
 wilcox.test(col.spleninfect_cfu, col.vehicle_cfu, exact=F)
 #data:  col.spleninfect_cfu and col.vehicle_cfu
-#W = 29, p-value = 0.5595
+#W = 29, p-value = 0.8584
 wilcox.test(col.spleninfect_cfu, col.splenmock_cfu, exact=F)
 #data:  col.spleninfect_cfu and col.splenmock_cfu
-#W = 22, p-value = 0.8253
+#W = 27, p-value = 1
 wilcox.test(col.vehicle_cfu, col.splenmock_cfu, exact=F)
 #data:  col.vehicle_cfu and col.splenmock_cfu
-#W = 20, p-value = 0.4113
+#W = 26, p-value = 0.2298
 
 #Correcting P-values for mutiple comparisons
-col_pvals<-c(0.5595,0.8253,0.4113)
+col_pvals<-c(0.8584,1,0.2298)
 round(p.adjust(col_pvals, method = "BH"),3)
 # bengamoni-hersh correction 
-# CFU at D26 Infected vs Vehicle : 0.825
-# CFU at D26 Infected vs Mock: 0.825
-# CFU at D26 Mock vs Vehicle: 0.825
+# CFU at D26 Infected vs Vehicle :1
+# CFU at D26 Infected vs Mock: 1
+# CFU at D26 Mock vs Vehicle: 0.689
 
 
 
 ##Plotting D26 Data 
 colors<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3")
 #order the dataset so that it will plot vehicle first on the left
-colonization.D26.no1433.1444$Treatment_2<-factor(colonization.D26.no1433.1444$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
-
-d26.plot<-ggplot(colonization.D26.no1433.1444, aes(x=Treatment_2, y=CFU_g, fill=factor(Treatment_2)))+ 
-  geom_jitter(aes(shape=21) , width = 0.2, height = 0.01, size = 4)+
-  scale_shape_identity()+
-  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
-  scale_fill_manual(values = colors) +
+colonization.D26$Treatment_2<-factor(colonization.D26$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
+shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =25, "150" =7 , "150A" =8)
+d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Treatment_2), fill=factor(Treatment_2))) + #, shape=factor(Cage)))+ 
+ stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
+ # scale_shape_manual(values= shape_cage)+
+  geom_jitter(width = 0.2, height = 0.01, size= 5)+
+  scale_color_manual(values = colors) +
+  scale_fill_manual(values = colors)+
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)), limits=c(10,4*10^8)) +
   labs(y = expression(paste(" CFU ", "per Gram Feces")))+
   geom_hline(aes(yintercept=100), colour = "gray50", size = 1, linetype=2)
@@ -151,17 +154,17 @@ grid.draw(g)
 
 #Plotting All Cages Over time 
 
-colonization.no1433.1444$CFU_g[colonization.no1433.1444$CFU_g == "0"] <-fill.in.lod
+colonization$CFU_g[colonization$CFU_g == "0"] <-fill.in.lod
 #changes 0 values to LoD/sqt(2) so that it is clear they were not detected 
 
-colonization.no1433.1444.noD1<-colonization.no1433.1444[colonization.no1433.1444$Day != "1", ]
+colonization.noD1<-colonization[colonization$Day != "1", ]
 #removes Day 1 data from the data set, the data from this day is comprommised 
 #because the lables that were placed on the tubes threw off the weights and they were diluted way too much (and don't have a mechanism to fix it)
 
 
-cfu.treat<-summaryMED(colonization.no1433.1444.noD1, measurevar="CFU_g", metadata=c("Treatment_2","Day"), na.rm=TRUE)
+cfu.treat<-summaryMED(colonization.noD1, measurevar="CFU_g", metadata=c("Treatment_2","Day"), na.rm=TRUE)
 
-cfu.cage<-summaryMED(colonization.no1433.1444.noD1, measurevar="CFU_g", metadata=c("Cage","Day"), na.rm=TRUE)
+cfu.cage<-summaryMED(colonization.noD1, measurevar="CFU_g", metadata=c("Cage","Day"), na.rm=TRUE)
 group.cols<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3",
               "143"="#f91780", "146"="#f91780" , "150"="#f91780", "144"= "#db9204", "147" ="#db9204", "145"="#006670", "150A"= "#006670")
 
@@ -327,3 +330,4 @@ round(p.adjust(anosimD1_pvals, method = "BH"),3)
 #Report both the corrected P value and the R value as a rule of thumb an R value of 0.7 suggests that the groups are different 
 
 rm(list=ls())
+

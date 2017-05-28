@@ -1,0 +1,235 @@
+Mac version
+
+Using ReadLine
+
+Running 64Bit Version
+
+mothur v.1.39.0
+Last updated: 1/23/2017
+
+by
+Patrick D. Schloss
+
+Department of Microbiology & Immunology
+University of Michigan
+http://www.mothur.org
+
+When using, please cite:
+Schloss, P.D., et al., Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities. Appl Environ Microbiol, 2009. 75(23):7537-41.
+
+Distributed under the GNU General Public License
+
+Type 'help()' for information on the commands that are available
+
+For questions and analysis support, please visit our forum at https://www.mothur.org/forum
+
+Type 'quit()' to exit program
+Interactive Mode
+
+
+mothur > get.groups(shared=CDIclear.final.shared, accnos=Adaptiveimmuneclear_noD40.42.accnos)
+Selected groups: 1431D1, 1431D21, 1431D6, 1432D1, 1432D21, 1432D6, 1432Dneg12, 1433D1, 1433D21, 1433D6, 1433Dneg12, 1434D1, 1434D21, 1434D6, 1434Dneg12, 1441D1, 1441D21, 1441D6, 1441Dneg12, 1442D1, 1442D21, 1442D6, 1442Dneg12, 1443D1, 1443D21, 1443D6, 1443Dneg12, 1444D1, 1444D21, 1444D6, 1444Dneg12, 1451D1, 1451D21, 1451D6, 1452D1, 1452D21, 1452D6, 1452Dneg12, 1453D1, 1453D21, 1453D6, 1454D1, 1454D21, 1454D6, 1454Dneg12, 1461D1, 1461D21, 1461D6, 1461Dneg12, 1462D1, 1462D21, 1462D6, 1471D1, 1471D21, 1471D6, 1471Dneg12, 1472D1, 1472D21, 1472D6, 1472Dneg12, 1501D1, 1501D21, 1501D6, 1501Dneg12, 1502D1, 1502D21, 1502D6, 1503D1, 1503D21, 1503D6, 1503Dneg12, 1504D1, 1504D21, 1504D6, 1504Dneg12, 1505D1, 1505D21, 1505D6, 1505Dneg12, 151D0, 151D1, 151D10, 151D16, 151D22, 151D4, 151D44, 151D7, 151Dneg15, 152D0, 152D1, 152D10, 152D16, 152D22, 152D4, 152D44, 152D7, 152Dneg15, 153D0, 153D1, 153D10, 153D16, 153D22, 153D4, 153D44, 153D7, 153Dneg15, 154D0, 154D1, 154D10, 154D16, 154D22, 154D4, 154D44, 154D7, 154Dneg15, 161D0, 161D1, 161D10, 161D16, 161D22, 161D4, 161D44, 161D7, 161Dneg15, 162D0, 162D1, 162D10, 162D16, 162D22, 162D4, 162D44, 162D7, 162Dneg15, 163D0, 163D1, 163D10, 163D16, 163D22, 163D4, 163D44, 163D7, 163Dneg15, 164D0, 164D1, 164D10, 164D16, 164D22, 164D4, 164D44, 164D7, 164Dneg15, 173D0, 173D1, 173D10, 173D16, 173D22, 173D4, 173D44, 173D7, 173Dneg15, 174D0, 174D1, 174D10, 174D16, 174D22, 174D4, 174D44, 174D7, 174Dneg15, 181D0, 181D1, 181D4, 181Dneg15, 182D0, 182D1, 182D10, 182D16, 182D22, 182D4, 182D44, 182D7, 182Dneg15, 183D0, 183D1, 183D10, 183D16, 183D22, 183D4, 183D44, 183D7, 183Dneg15, 184D0, 184D1, 184D10, 184D16, 184D22, 184D4, 184D44, 184D7, 184Dneg15, 185D0, 185D1, 185D10, 185D16, 185D22, 185D4, 185D44, 185D7, 185Dneg15, 7101D00, 7101D01, 7101D04, 7101D07, 7101D10, 7101D13, 7101D16, 7101D22, 7101D28, 7101D34, 7101D37, 7101D44, 7101Dneg15, 7102D00, 7102D01, 7102D04, 7102D07, 7102D10, 7102D13, 7102D16, 7102D22, 7102D28, 7102D34, 7102D37, 7102D44, 7102Dneg15, 7103D00, 7103D01, 7103D04, 7103D07, 7103D10, 7103D13, 7103D16, 7103D22, 7103D28, 7103D34, 7103D37, 7103D44, 7103Dneg15, 7104D00, 7104D01, 7104D04, 7104D07, 7104D10, 7104D13, 7104D16, 7104D22, 7104D28, 7104D34, 7104D37, 7104D44, 7104Dneg15, 7105D00, 7105D01, 7105D04, 7105D07, 7105D10, 7105D13, 7105D16, 7105D22, 7105D28, 7105D34, 7105D37, 7105D44, 7105Dneg15, 7111D00, 7111D01, 7111D04, 7111D07, 7111D10, 7111D13, 7111D16, 7111D22, 7111D28, 7111D34, 7111D37, 7111D44, 7111Dneg15, 7112D00, 7112D01, 7112D04, 7112D07, 7112D10, 7112D13, 7112D16, 7112D22, 7112D28, 7112D34, 7112D37, 7112D44, 7112Dneg15, 7113D00, 7113D01, 7113D04, 7113D07, 7113D10, 7113D13, 7113D16, 7113D22, 7113D28, 7113D34, 7113D37, 7113D44, 7113Dneg15, 7121D00, 7121D01, 7121D04, 7121D07, 7121D10, 7121D13, 7121D16, 7121D22, 7121D28, 7121D34, 7121D37, 7121D44, 7121Dneg15, 7122D00, 7122D01, 7122D04, 7122D07, 7122D10, 7122D13, 7122D16, 7122D22, 7122D28, 7122D34, 7122D37, 7122D44, 7122Dneg15, 7123D00, 7123D00p2, 7123D01, 7123D04, 7123D07, 7123D10, 7123D13, 7123D16, 7123D22, 7123D28, 7123D34, 7123D37, 7123D44, 7123Dneg15, 7124D00, 7124D01, 7124D07, 7124D10, 7124D13, 7124D16, 7124D22, 7124D28, 7124D34, 7124D37, 7124D44, 7124Dneg15, 7131D00, 7131D01, 7131D04, 7131D07, 7131D10, 7131D13, 7131D16, 7131D22, 7131D28, 7131D34, 7131D37, 7131D44, 7131Dneg15, 7132D00, 7132D01, 7132D07, 7132D10, 7132D13, 7132D16, 7132D22, 7132D34, 7132D37, 7132D44, 7132Dneg15, 7133D00, 7133D01, 7133D04, 7133D07, 7133D10, 7133D13, 7133D16, 7133D22, 7133D28, 7133D34, 7133D37, 7133D44, 7133Dneg15, 7134D00, 7134D01, 7134D07, 7134D10, 7134D13, 7134D16, 7134D22, 7134D28, 7134D34, 7134D37, 7134D44, 7134Dneg15, 7135D00, 7135D01, 7135D04, 7135D07, 7135D10, 7135D13, 7135D16, 7135D22, 7135D28, 7135D34, 7135D37, 7135D44, 7135Dneg15, 7141D00, 7141D01, 7141D04, 7141D07, 7141D10, 7141D13, 7141D16, 7141D22, 7141D34, 7141D37, 7141D44, 7141Dneg15, 7142D00, 7142D01, 7142D04, 7142D07, 7142D10, 7142D13, 7142D16, 7142D22, 7142D34, 7142D37, 7142D44, 7142Dneg15, 7143D00, 7143D01, 7143D04, 7143D07, 7143D10, 7143D13, 7143D16, 7143D22, 7143D28, 7143D34, 7143D37, 7143D44, 7143Dneg15, 7144D00, 7144D01, 7144D04, 7144D07, 7144D10, 7144D13, 7144D16, 7144D22, 7144D28, 7144D34, 7144D37, 7144D44, 7144Dneg15, 7151D00, 7151D01, 7151D04, 7151D07, 7151D10, 7151D13, 7151D16, 7151D22, 7151D28, 7151D34, 7151D37, 7151D44, 7151Dneg15, 7152D00, 7152D01, 7152D04, 7152D07, 7152D10, 7152D13, 7152D16, 7152D22, 7152D28, 7152D34, 7152D37, 7152D44, 7152Dneg15, 7153D00, 7153D01, 7153D04, 7153D07, 7153D10, 7153D13, 7153D16, 7153D22, 7153D28, 7153D34, 7153D37, 7153D44, 7153Dneg15, 7154D01, 7154D07, 7154D10, 7154D13, 7154D16, 7154D22, 7154D28, 7154D34, 7154D37, 7154D44, 7154Dneg15, 7155D00, 7155D01, 7155D04, 7155D07, 7155D10, 7155D13, 7155D16, 7155D22, 7155D28, 7155D34, 7155D37, 7155D44, 7155Dneg15, 9743D0, 9743D1, 9743D10, 9743D16, 9743D22, 9743D4, 9743D44, 9743D7, 9743Dneg15, 9744D0, 9744D1, 9744D10, 9744D16, 9744D22, 9744D4, 9744D44, 9744D7, 9744Dneg15, 9761D0, 9761D1, 9761D10, 9761D16, 9761D22, 9761D4, 9761D7, 9761Dneg15, 9762D0, 9762D1, 9762D10, 9762D16, 9762D22, 9762D4, 9762D7, 9762Dneg15, 9763D0, 9763D1, 9763D10, 9763D16, 9763D22, 9763D4, 9763D40, 9763D41, 9763D7, 9763Dneg15, 9764D0, 9764D1, 9764D10, 9764D16, 9764D22, 9764D4, 9764D40, 9764D41, 9764D7, 9764Dneg15, 9771D0, 9771D1, 9771D10, 9771D16, 9771D22, 9771D4, 9771D44, 9771D7, 9771Dneg15, 9772D0, 9772D1, 9772D10, 9772D16, 9772D16A, 9772D16B, 9772D22, 9772D4, 9772D44, 9772D7, 9772Dneg15, 9773D0, 9773D1, 9773D10, 9773D16, 9773D22, 9773D22A, 9773D22B, 9773D4, 9773D44, 9773D7, 9773Dneg15, 9774D0, 9774D1, 9774D10, 9774D16, 9774D22, 9774D4, 9774D44, 9774D7, 9774Dneg15, 9781D0, 9781D1, 9781D10, 9781D16, 9781D22, 9781D4, 9781D44, 9781D7, 9781Dneg15, 9782D0, 9782D1, 9782D10, 9782D16, 9782D22, 9782D4, 9782D44, 9782D7, 9782Dneg15, 9783D0, 9783D1, 9783D10, 9783D16, 9783D22, 9783D4, 9783D44, 9783D7, 9783Dneg15, 9784D0, 9784D1, 9784D10, 9784D16, 9784D22, 9784D4, 9784D44a, 9784D44b, 9784D7, 9784Dneg15, 9785D0, 9785D1, 9785D10, 9785D16, 9785D22, 9785D4, 9785D7, 9785Dneg15, 9791D0, 9791D1, 9791D10, 9791D16, 9791D22, 9791D4, 9791D44, 9791D7, 9791Dneg15, 9792D0, 9792D1, 9792D10, 9792D16, 9792D22, 9792D4, 9792D44, 9792D7, 9792Dneg15, 9793D0, 9793D1, 9793D10, 9793D16, 9793D22, 9793D22A, 9793D22B, 9793D4, 9793D44, 9793D7, 9793Dneg15, 9794D0, 9794D1, 9794D10, 9794D16, 9794D22, 9794D4, 9794D44, 9794D7, 9794Dneg15, 9961D0, 9961D1, 9961D10, 9961D16, 9961D22, 9961D4, 9961D44, 9961D7, 9961Dneg15, 9962D0, 9962D1, 9962D10, 9962D16, 9962D22, 9962D4, 9962D44, 9962D7, 9962Dneg15, BlankCA1, BlankCC1, BlankCG2, BlankCH11, BlankCH2, BlankCH3, EmptyA, PBS1, PBS10112016, PBS2, Plate6Blank, Plate7Blank1, Plate7Blank2, Plate9Blank1, Plate9Blank10, Plate9Blank11, Plate9Blank12, Plate9Blank13, Plate9Blank2, Plate9Blank3, Plate9Blank4, Plate9Blank5, Plate9Blank6, Plate9Blank7, Plate9Blank8, Plate9Blank9, Water02132015, WaterA111714, WaterC111714, WaterD072315, empty1, empty10, empty2, empty2A8, empty2H9, empty3, empty3H7, empty4, empty4H10, empty5, empty6, empty7, empty8, empty9, extractctlA, extractctlB, water, water1, water2, water3, water4, waterC022717 from your shared file.
+
+Output File names: 
+CDIclear.final.0.03.pick.shared
+
+
+mothur > system(mv CDIclear.final.0.03.pick.shared Adaptiveimmuneclear_noD40.42.shared)
+
+
+mothur > sub.sample(shared=Adaptiveimmuneclear_noD40.42.shared, size=10000)
+151D0 contains 8345. Eliminating.
+152D0 contains 6356. Eliminating.
+152D10 contains 9713. Eliminating.
+152D7 contains 8441. Eliminating.
+153D0 contains 6612. Eliminating.
+154D0 contains 7195. Eliminating.
+162D0 contains 9227. Eliminating.
+162D1 contains 9546. Eliminating.
+163D0 contains 6730. Eliminating.
+163D1 contains 7137. Eliminating.
+173D0 contains 7904. Eliminating.
+174D0 contains 9405. Eliminating.
+182D0 contains 7467. Eliminating.
+182D1 contains 9917. Eliminating.
+182D10 contains 8976. Eliminating.
+183D7 contains 8144. Eliminating.
+184D1 contains 8511. Eliminating.
+184D4 contains 9308. Eliminating.
+185D1 contains 9957. Eliminating.
+7111D13 contains 8963. Eliminating.
+7124D13 contains 7198. Eliminating.
+9744D0 contains 9416. Eliminating.
+9744D4 contains 9868. Eliminating.
+9761D0 contains 8538. Eliminating.
+9761D10 contains 9238. Eliminating.
+9761D16 contains 9628. Eliminating.
+9761D7 contains 8779. Eliminating.
+9762D0 contains 8057. Eliminating.
+9762D1 contains 8147. Eliminating.
+9762D7 contains 9996. Eliminating.
+9763D0 contains 8006. Eliminating.
+9764D0 contains 7976. Eliminating.
+9771D1 contains 8872. Eliminating.
+9773D1 contains 9640. Eliminating.
+9774D4 contains 8329. Eliminating.
+9774D7 contains 9978. Eliminating.
+9793D1 contains 9018. Eliminating.
+9793D22A contains 5021. Eliminating.
+9793D22B contains 7186. Eliminating.
+9793D7 contains 9628. Eliminating.
+9794D7 contains 9819. Eliminating.
+9961D0 contains 7347. Eliminating.
+9962D0 contains 9724. Eliminating.
+BlankCA1 contains 33. Eliminating.
+BlankCC1 contains 37. Eliminating.
+BlankCG2 contains 35. Eliminating.
+BlankCH11 contains 27. Eliminating.
+BlankCH2 contains 28. Eliminating.
+BlankCH3 contains 1288. Eliminating.
+EmptyA contains 600. Eliminating.
+PBS1 contains 689. Eliminating.
+PBS10112016 contains 35. Eliminating.
+PBS2 contains 2068. Eliminating.
+Plate6Blank contains 77. Eliminating.
+Plate7Blank1 contains 80. Eliminating.
+Plate7Blank2 contains 82. Eliminating.
+Plate9Blank1 contains 38. Eliminating.
+Plate9Blank10 contains 20. Eliminating.
+Plate9Blank11 contains 185. Eliminating.
+Plate9Blank12 contains 33. Eliminating.
+Plate9Blank13 contains 166. Eliminating.
+Plate9Blank2 contains 43. Eliminating.
+Plate9Blank3 contains 54. Eliminating.
+Plate9Blank4 contains 1216. Eliminating.
+Plate9Blank5 contains 343. Eliminating.
+Plate9Blank6 contains 72. Eliminating.
+Plate9Blank7 contains 169. Eliminating.
+Plate9Blank8 contains 65. Eliminating.
+Plate9Blank9 contains 11. Eliminating.
+Water02132015 contains 39. Eliminating.
+WaterA111714 contains 114. Eliminating.
+WaterC111714 contains 224. Eliminating.
+WaterD072315 contains 464. Eliminating.
+empty1 contains 25. Eliminating.
+empty10 contains 70. Eliminating.
+empty2 contains 26. Eliminating.
+empty2A8 contains 524. Eliminating.
+empty2H9 contains 751. Eliminating.
+empty3 contains 23. Eliminating.
+empty3H7 contains 176. Eliminating.
+empty4 contains 22. Eliminating.
+empty4H10 contains 1059. Eliminating.
+empty5 contains 34. Eliminating.
+empty6 contains 9. Eliminating.
+empty7 contains 9. Eliminating.
+empty8 contains 57. Eliminating.
+empty9 contains 7. Eliminating.
+extractctlA contains 34. Eliminating.
+extractctlB contains 142. Eliminating.
+water contains 524. Eliminating.
+water1 contains 49. Eliminating.
+water2 contains 326. Eliminating.
+water3 contains 582. Eliminating.
+water4 contains 1399. Eliminating.
+waterC022717 contains 15. Eliminating.
+Sampling 10000 from each group.
+0.03
+
+Output File Names: 
+Adaptiveimmuneclear_noD40.42.0.03.subsample.shared
+
+
+mothur > filter.shared(shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.shared, minnumsamples=6)
+0.03
+
+Removed 2380 OTUs.
+
+Output File Names: 
+Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared
+
+
+mothur > get.groups(shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared, accnos=D21_adoptivetrans.no1433.1444.accnos.txt)
+Unable to open D21_adoptivetrans.no1433.1444.accnos.txt. Trying default /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.accnos.txt
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.accnos.txt. Trying mothur's location /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.accnos.txt
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.accnos.txt
+[ERROR]: did not complete get.groups.
+
+mothur > get.groups(shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared, accnos=D21_adoptivetrans.no1433.1444.accnos.txt)
+Selected groups: 1431D21, 1432D21, 1434D21, 1441D21, 1442D21, 1443D21, 1451D21, 1452D21, 1453D21, 1454D21, 1461D21, 1462D21, 1471D21, 1472D21, 1501D21, 1502D21, 1503D21, 1504D21, 1505D21 from your shared file.
+
+Output File names: 
+Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared
+
+
+mothur > system(mv Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared)
+
+
+mothur > lefse(shared=D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared, design=D21.IgGposneg.no1433.1444.txt)
+
+You did not provide a class, using value0.
+
+0.03
+
+Number of significantly discriminative features: 28 ( 29 ) before internal wilcoxon.
+Number of discriminative features with abs LDA score > 2 : 28.
+
+Output File Names: 
+D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.0.03.lefse_summary
+
+
+mothur > get.groups(shared=shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared, accnos=2016_RAG_adoptivetransfer.preabx.accnos.txt)
+Unable to open shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared. Trying default /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared. Trying mothur's location /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared
+Using D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared as input file for the shared parameter.
+[ERROR]: did not complete get.groups.
+
+mothur > get.groups(shared=Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared, accnos=2016_RAG_adoptivetransfer.preabx.accnos.txt)
+Selected groups: 1432Dneg12, 1433Dneg12, 1434Dneg12, 1441Dneg12, 1442Dneg12, 1443Dneg12, 1444Dneg12, 1452Dneg12, 1454Dneg12, 1461Dneg12, 1471Dneg12, 1472Dneg12, 1501Dneg12, 1503Dneg12, 1504Dneg12, 1505Dneg12 from your shared file.
+
+Output File names: 
+Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared
+
+
+mothur > system(mv Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared Preabx_adoptivetrans.0.03.subsample.0.03.filter.0.03.pick.shared)
+
+
+mothur > lefse(shared=D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared, design=Adoptivetransfer_preabx_design)
+Unable to open D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared. Trying default /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared. Trying mothur's location /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/D21_adoptivetrans.no1433.1444.0.03.subsample.0.03.filter.0.03.pick.shared
+Unable to open Adoptivetransfer_preabx_design. Trying default /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design. Trying mothur's location /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+[ERROR]: did not complete lefse.
+
+mothur > lefse(shared=Preabx_adoptivetrans.0.03.subsample.0.03.filter.0.03.pick.shared, design=Adoptivetransfer_preabx_design)
+Unable to open Adoptivetransfer_preabx_design. Trying default /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design. Trying mothur's location /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+Unable to open /Users/Jhansi/Box Sync/AdaptiveImmunity_Clearance_Cdiff/16S/Adoptivetransfer_preabx_design
+[ERROR]: did not complete lefse.
+
+mothur > lefse(shared=Preabx_adoptivetrans.0.03.subsample.0.03.filter.0.03.pick.shared, design=Adoptivetransfer_preabx_design.txt)
+
+You did not provide a class, using value0.
+
+0.03
+
+Number of significantly discriminative features: 18 ( 18 ) before internal wilcoxon.
+Number of discriminative features with abs LDA score > 2 : 18.
+
+Output File Names: 
+Preabx_adoptivetrans.0.03.subsample.0.03.filter.0.03.pick.0.03.lefse_summary
+
+
+mothur > quit
+
+
+************************************************************
+************************************************************
+************************************************************
+Detected 4 [ERROR] messages, please review.
+************************************************************
+************************************************************
+************************************************************
