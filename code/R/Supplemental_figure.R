@@ -7,9 +7,7 @@ library(ggplot2)
 library(grid)
 library(scales)
 
-
-# Figure S1: Colonization in WT donor mice. 
-## Modified from soure of function: http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/
+# Modified from soure of function: http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/
 ## Gives count, first quartile, median and thrid quartile 
 ##   data: a data frame.
 ##   measurevar: the name of a column that contains the variable to be summariezed
@@ -38,6 +36,7 @@ summaryMED<-function(data=NULL, measurevar, metadata=NULL, na.rm=FALSE, .drop=TR
   return(data1)
 }
 
+# Supp Figure 1: Colonization in WT donor mice. 
 donor.col<-read.delim(file= "Adoptivetransfer_donor_colonization.txt", header = T)
 #Replace the 100 in the mice that actually had undectable levles with LOD/squarroot of 2
 #the LOD is 100 
@@ -74,7 +73,36 @@ SA2 = SA1 + geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linet
 SA3 = SA2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 SA3
 
-#Supplmental figure: Colonization of other mice included in 
+#Supp Figure 2: Total IgG By Cage 
+IgG<-read.delim(file="TotalIgG_April_5_2017.txt", header = T)
+#replacing cage 150 with 150A because these 
+#Plotting the data 
+#to clearly show points that were not detected (vs detected at LOD), change values to be below LOD line in the figure 
+IgG$Total_IgG<-replace(IgG$Total_IgG, IgG$Total_IgG==0, -500) 
+#if you want to change the values again you will have to replace fill.in.lod with -500 etc. 
+
+#assign colors to different treatment groups
+colors<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3")
+
+##order the dataset so that it will plot vehicle first on the left
+IgG$Treatment_2<-factor(IgG$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
+shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =25, "150" =7 , "150A" =8)
+#Make a jitter plot of the data 
+igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, color=factor(Treatment_2), fill=factor(Treatment_2),shape=factor(Cage)))+ 
+  scale_shape_manual(values= shape_cage)+
+  geom_jitter(width = 0.2, height = 0.01, size= 5)+
+  scale_color_manual(values = colors) +
+  scale_fill_manual(values = colors) +
+  geom_hline(aes(yintercept=1.56), colour = "grey50", size = 1, linetype=2)
+
+two.B = igg.plot + 
+  #eliminates background, gridlines and key border
+  theme_bw()
+two.B  = two.B + labs(y = "Serum IgG ng/ml")
+two.B 
+
+
+#Supp figure: Colonization of other mice included in Random Forest 
 
 #Colonization WT 2013 Experiment
 ###Read in the data for all experiments 
@@ -99,7 +127,8 @@ cfu.exp13.NoD13<-cfu.exp13.NoD13[-c(cfu.710), ]
 cfu.711<-grep("711",cfu.exp13.NoD13$Cage, value=F)
 #pulls out where cage 711 data points are now you have removed 710 data
 cfu.exp13.NoD13<-cfu.exp13.NoD13[-c(cfu.711), ]
-
+cfu.exp13.NoD13$CFU_g <- replace(cfu.exp13.NoD13$CFU_g, cfu.exp13.NoD13$CFU_g==100, 25)
+#replaces 100 which is LoD with 25 which is easier to see 
 ##Determine the Median and IQR for  CFU grouped by Treatment group 
 cfu.exp13.NoD13<-summaryMED(cfu.exp13.NoD13, measurevar="CFU_g", metadata=c("Cage","Day"), na.rm=TRUE)
 
@@ -128,3 +157,4 @@ SB1  = SB + labs(y = expression(paste(Log[10], " CFU ", "per Gram Feces")))
 SB2 = SB1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
 SB3 = SB2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 SB3
+

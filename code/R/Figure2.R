@@ -99,9 +99,9 @@ colors<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehi
 #order the dataset so that it will plot vehicle first on the left
 colonization.D26$Treatment_2<-factor(colonization.D26$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
 shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =25, "150" =7 , "150A" =8)
-d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Treatment_2), fill=factor(Treatment_2))) + #, shape=factor(Cage)))+ 
- stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
- # scale_shape_manual(values= shape_cage)+
+d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Treatment_2), fill=factor(Treatment_2), shape=factor(Cage)))+ 
+ #stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
+  scale_shape_manual(values= shape_cage)+
   geom_jitter(width = 0.2, height = 0.01, size= 5)+
   scale_color_manual(values = colors) +
   scale_fill_manual(values = colors)+
