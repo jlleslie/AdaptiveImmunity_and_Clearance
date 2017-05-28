@@ -221,7 +221,7 @@ grid.draw(g3)
 #### MDS of D1 communites 
 #Read in required  data 
 #Read in filted and subsampled shared file this file has more data than is used for this analysis 
-otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.filter.0.03.subsample.shared", header = T)
+otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header = T)
 otu.shared$label<-NULL
 otu.shared$numOtus<-NULL
 #removes label and numOtus columns from the dataframe
@@ -276,7 +276,7 @@ D1_nmds_meta_centoids <- aggregate(cbind(D1.cent.nmds$MDS1, D1.cent.nmds$MDS2)~ 
 #Plot D1 data as an empty plot and then add points for each cage 
 #color = treatment group they will end up in #shape= cage 
 plot(D1_nmds_meta$MDS1, D1_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
-     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-2.5,1.5), ylim=c(-1.5,1))
+     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-3.5,1.5), ylim=c(-3,3))
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
 axis(side = 2, col="grey80", las=1)
 axis(side = 1, col="grey80", las=1)
