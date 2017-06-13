@@ -25,7 +25,7 @@ setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
 shared$label<-NULL
 shared$numOtus<-NULL
-meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.txt", header=T, row.names = 1)
+meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.tsv", header=T, row.names = 1)
 meta.data.coho<-meta.data[meta.data$Year=="2014" & meta.data$Treatment_1=="630",]
 meta.data.coho.dneg15<-meta.data.coho[meta.data.coho$Day=="-15" & meta.data.coho$Mouse!="181",]
 #Exluded mouse 18-1 because it died during the course of the experiment 

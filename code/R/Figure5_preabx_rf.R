@@ -21,8 +21,6 @@ metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
 shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
 
-# Define output file
-plot_file <- '~/Desktop/Repositories/clearance_2017/figures/Figure_5_RF.pdf'
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -57,8 +55,8 @@ rm(metadata)
 
 # Subset to groups of interest for analysis
 # Cleared vs Colonized
-cleared_colonized <- subset(shared, shared$Colonization630_stat != 'uncolonized')
-cleared_colonized$Colonization630_stat <- factor(cleared_colonized$Colonization630_stat)
+cleared_colonized <- subset(shared, shared$Colonization_stat630 != 'unchallenged')
+cleared_colonized$Colonization_stat630 <- factor(cleared_colonized$Colonization_stat630)
 cleared_colonized_preabx <- subset(cleared_colonized, Day %in% c(-15,-12))
 cleared_colonized_preabx$Co_Housed <- NULL
 cleared_colonized_preabx$Day <- NULL
@@ -67,16 +65,16 @@ rm(cleared_colonized)
 rm(shared)
 
 # Subset to most informative OTUs from previous RF analysis
-pruned_shared <- cleared_colonized_preabx[, c('Colonization630_stat','Otu0052', 'Otu0093', 'Otu0026')]
+pruned_shared <- cleared_colonized_preabx[, c('Colonization_stat630','Otu0052', 'Otu0093', 'Otu0026')]
 
 #--------------------------------------------------------------------#
 
 # preabx time point
 # Determine optimal ntree and mtry
-factor1 <- as.vector(levels(cleared_colonized_preabx$Colonization630_stat))[1]
-factor2 <- as.vector(levels(cleared_colonized_preabx$Colonization630_stat))[2]
-num1 <- round(length(which(cleared_colonized_preabx$Colonization630_stat == factor1)) * 0.623)
-num2 <- round(length(which(cleared_colonized_preabx$Colonization630_stat == factor2)) * 0.623)
+factor1 <- as.vector(levels(cleared_colonized_preabx$Colonization_stat630))[1]
+factor2 <- as.vector(levels(cleared_colonized_preabx$Colonization_stat630))[2]
+num1 <- round(length(which(cleared_colonized_preabx$Colonization_stat630 == factor1)) * 0.623)
+num2 <- round(length(which(cleared_colonized_preabx$Colonization_stat630 == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
 trees <- round(ncol(cleared_colonized_preabx) - 1) * ntree_multiplier
 tries <- round(sqrt(ncol(cleared_colonized_preabx) - 1))
@@ -85,7 +83,7 @@ rm(factor1, factor2, num1, num2, ntree_multiplier)
 # Run random forest and assess predictive value
 accuracies <- c()
 for (i in 1:100){
-cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization630_stat~.,
+cleared_preabx_rf <- randomForest(cleared_colonized_preabx$Colonization_stat630~.,
                                   data=cleared_colonized_preabx, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 accuracies[i] <- (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))
@@ -100,17 +98,17 @@ print(cleared_preabx_rf)
 preabx_importances <- importance(cleared_preabx_rf, type=1)
 
 # Get accuracy of binning from pruned feature set
-factor1 <- as.vector(levels(pruned_shared$Colonization630_stat))[1]
-factor2 <- as.vector(levels(pruned_shared$Colonization630_stat))[2]
-num1 <- round(length(which(pruned_shared$Colonization630_stat == factor1)) * 0.623)
-num2 <- round(length(which(pruned_shared$Colonization630_stat == factor2)) * 0.623)
+factor1 <- as.vector(levels(pruned_shared$Colonization_stat630))[1]
+factor2 <- as.vector(levels(pruned_shared$Colonization_stat630))[2]
+num1 <- round(length(which(pruned_shared$Colonization_stat630 == factor1)) * 0.623)
+num2 <- round(length(which(pruned_shared$Colonization_stat630 == factor2)) * 0.623)
 ntree_multiplier <- max(c((num1/num2), (num2/num2))) * 3 
 trees <- round(ncol(pruned_shared) - 1) * ntree_multiplier
 tries <- round(sqrt(ncol(pruned_shared) - 1))
 rm(factor1, factor2, num1, num2, ntree_multiplier)
 accuracies <- c()
 for (i in 1:100){
-pruned_rf <- randomForest(pruned_shared$Colonization630~., 
+pruned_rf <- randomForest(pruned_shared$Colonization_stat630~., 
                                   data=pruned_shared, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 accuracies[i] <- (100-round((tail(pruned_rf$err.rate[,1], n=1)*100), 2))
@@ -139,11 +137,11 @@ cleared_preabx_shared <- cleared_colonized_preabx[, c(1,which(colnames(cleared_c
 rm(cleared_colonized_preabx)
 
 # Break into experimental groups
-colonized_preabx_shared <- subset(cleared_preabx_shared, Colonization630_stat == 'colonized')
-colonized_preabx_shared$Colonization630_stat <- NULL
+colonized_preabx_shared <- subset(cleared_preabx_shared, Colonization_stat630 == 'colonized')
+colonized_preabx_shared$Colonization_stat630 <- NULL
 colonized_preabx_shared <- colonized_preabx_shared[,match(rownames(preabx_importances), colnames(colonized_preabx_shared))] 
-cleared_preabx_shared <- subset(cleared_preabx_shared, Colonization630_stat == 'cleared')
-cleared_preabx_shared$Colonization630_stat <- NULL
+cleared_preabx_shared <- subset(cleared_preabx_shared, Colonization_stat630 == 'cleared')
+cleared_preabx_shared$Colonization_stat630 <- NULL
 cleared_preabx_shared <- cleared_preabx_shared[,match(rownames(preabx_importances), colnames(cleared_preabx_shared))]
 
 #--------------------------------------------------------------------#
@@ -181,16 +179,15 @@ colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
 #--------------------------------------------------------------------#
 
 # Set up plotting environment
-pdf(file=plot_file, width=11, height=6)
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
 #---------------------#
 
 # Cleared vs colonized
 # RF median decrease accuracy
-par(mar=c(1.8,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
-dotchart(preabx_importances$MDA, labels=rownames(preabx_importances),
-         lcolor=NA, cex=1.7, color='black', 
+par(mar=c(2,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.2,0))
+dotchart(preabx_importances$MDA, labels=toupper(rownames(preabx_importances)),
+         lcolor=NA, cex=1.1, color='black', 
          xlab='', xlim=c(2,14), pch=19, lwd=3)
 segments(x0=rep(2, 10), y0=c(1:10), x1=rep(14, 10), y1=c(1:10), lty=2) # Dotted lines
 legend('bottomright', legend=preabx_accuracy, pt.cex=0, cex=1.2, bty='n')
@@ -198,7 +195,7 @@ par(xaxt='s')
 axis(side=1, at=c(2,4,6,8,10,12,14), labels=c(0,4,6,8,10,12,14), cex.axis=1.2, tck=-0.025)
 axis.break(1, 3, style='slash')
 mtext('Mean Decrease Accuracy', side=1, padj=1.8, cex=0.9)
-mtext('A', side=2, line=2, las=2, adj=1, padj=-13.2, cex=1.7)
+mtext('A', side=2, line=2, las=2, adj=1, padj=-17.3, cex=1.7)
 
 # OTU abundance differences
 # Abundance (per 10000 sequences)
@@ -225,15 +222,14 @@ axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01)
 axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01)
 legend('topright', legend=c('Cleared', 'Colonized'),
-       pch=c(21, 21), pt.bg=c('deeppink','darkblue'), bg='white', pt.cex=2, cex=1.2)
-axis(2, at=seq(1,index-2,2)+0.6, labels=rownames(preabx_importances), las=1, line=-0.5, tick=F, cex.axis=1.4)
+      pch=c(21, 21), pt.bg=c('deeppink','darkblue'), bg='white', pt.cex=2, cex=1.1)
+axis(2, at=seq(1,index-2,2)+0.6, labels=toupper(rownames(preabx_importances)), las=1, line=-0.5, tick=F, cex.axis=1.4)
 formatted_taxa <- lapply(1:nrow(preabx_importances), function(x) bquote(paste(.(preabx_importances$phylum[x]),'; ',italic(.(preabx_importances$genus[x])), sep='')))
 axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
 italic_p <- lapply(1:length(preabx_importances$pvalues), function(x) bquote(paste(italic('p'), .(preabx_importances$pvalues[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
-mtext('B', side=2, line=2, las=2, adj=13, padj=-13, cex=1.7)
+mtext('B', side=2, line=2, las=2, adj=13, padj=-17, cex=1.7)
 
-dev.off()
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
 

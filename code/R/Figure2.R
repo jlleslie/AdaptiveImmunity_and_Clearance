@@ -109,7 +109,7 @@ d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Trea
   labs(y = expression(paste(" CFU ", "per Gram Feces")))+
   geom_hline(aes(yintercept=100), colour = "gray50", size = 1, linetype=2)
 #theme with white background
-three.a = d26.plot + 
+two.b = d26.plot + 
   #eliminates background, gridlines and key border
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -136,7 +136,7 @@ gtext.vhe<-textGrob("Vehicle",gp = gpar(fontsize = 10))
 gtext.ns <-textGrob("ns", gp = gpar(fontsize = 13))  
 
 
-three.a  = three.a  + annotation_custom(gtext.ns, xmin=2, xmax=2, ymin = 8.1, ymax= 8.2) + 
+two.b  = two.b + annotation_custom(gtext.ns, xmin=2, xmax=2, ymin = 8.1, ymax= 8.2) + 
   annotate("segment", x = 1, xend = 3, y = 100000000, yend = 100000000, colour = "black", size = 0.7) +
   annotation_custom(gtext.ns, xmin=2.5, xmax=2.5, ymin=8.35, ymax=8.6) +  
   annotate("segment", x = 2, xend = 3, y = 200000000, yend = 200000000, colour = "black", size = 0.7) +
@@ -146,7 +146,7 @@ three.a  = three.a  + annotation_custom(gtext.ns, xmin=2, xmax=2, ymin = 8.1, ym
   annotation_custom(gtext.splenmock, xmin=2, xmax=2,  ymin=0, ymax=0) +
   annotation_custom(gtext.vhe, xmin=1, xmax=1, ymin=0, ymax=0)
 
-g = ggplotGrob(three.a)
+g = ggplotGrob(two.b)
 g$layout$clip[g$layout$name=="panel"] <- "off"
 grid.draw(g)
 
@@ -175,7 +175,7 @@ cfu.plot<-ggplot(cfu.treat, aes(x=Day, y=CFU_g, color=factor(Treatment_2)))+
   scale_color_manual(values=group.cols)+
   scale_x_continuous(breaks = c(3,6,9,12,15,18,21,24), limits =c(3, 26))
 #theme with white background
-b = cfu.plot + 
+a= cfu.plot + 
   #eliminates background, gridlines and key border
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -193,17 +193,17 @@ b = cfu.plot +
     ,axis.text.x=element_text(size=11)
     ,plot.margin = unit(c(1,1,2,1), "lines")
   )
-b1 = b + labs(y = " CFU per Gram Feces", x = "Day Post Infection")
-b2 = b1+ geom_hline(aes(yintercept=100), colour = "gray50", size = 1, linetype=2)
-b3 = b2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x))) 
-b3
+a1 = a + labs(y = " CFU per Gram Feces", x = "Day Post Infection")
+a2 = a1+ geom_hline(aes(yintercept=100), colour = "gray50", size = 1, linetype=2)
+a3 = a2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x))) 
+a3
 
 # Add in the lables for treatment groups outside of the plot
 gtext.spleninfect<-textGrob("Splenocytes\n(infected donor)", gp = gpar(fontsize = 8))  
 gtext.splenmock<-textGrob("Splenocytes\n(uninfected donor)", gp = gpar(fontsize = 8))  
 gtext.vhe<-textGrob("Vehicle",gp = gpar(fontsize = 8)) 
 
-three.b  = b3 + 
+two.a  = a3 + 
    annotate("rect", xmin = 15, xmax = 16, ymin = 100000, ymax = 200000, fill = "#0095a3")+  
    annotation_custom(gtext.vhe, xmin=20, xmax=20,  ymin = 5, ymax =5.3 ) +
    annotate("rect", xmin = 15, xmax = 16, ymin = 10000, ymax = 20000, fill = "#fa8c17")+  
@@ -211,7 +211,7 @@ three.b  = b3 +
    annotate("rect", xmin = 15, xmax = 16, ymin = 1000, ymax = 2000, fill = "#f91780")+  
   annotation_custom(gtext.spleninfect, xmin = 21, xmax = 21,  ymin =3, ymax = 3.3) 
 
-g3 = ggplotGrob(three.b)
+g3 = ggplotGrob(two.a)
 g$layout$clip[g$layout$name=="panel"] <- "off"
 grid.draw(g3)
 
@@ -237,7 +237,6 @@ row.names(otu.shared.adoptrans)<-otu.shared.adoptrans$Group
 otu.shared.adoptrans$Group<-NULL
 
 
-## Figure 4A:  MDS Ordination of D1 Communites 
 # question: Was the communites of the mice that cleared differenet before adooptive transfer treatment? 
 #add metadata file so you can easily pull out samples based on their metat data
 otu_meta<-merge(otu.shared.adoptrans,meta.data, by= 'row.names')

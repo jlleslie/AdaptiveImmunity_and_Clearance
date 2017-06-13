@@ -112,7 +112,7 @@ wilcox.test(dist.veh, dist.infect.n143)
 #W = 1, p-value = 0.1143
 #conclusion: removing those cages doesn't alter the fact that there is no significant difference between the groups 
 
-#Plotting the results includeing the cage 143 
+#Plotting the results including cage 143 (cage that cleared)
 
 #Adding NA to make a table to graph 
 dist.veh.1 = c(dist.veh, NA, NA,NA)
