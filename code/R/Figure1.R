@@ -70,9 +70,9 @@ donor.antitoxin.plot<-ggplot(donors, aes(x=Treatment_Grp, y=AntitoxinA_IgG_Titer
   scale_color_manual(values = rep("black",2)) +
   scale_fill_manual(values = colors.don, limits = c("uninfected_donor", "630_infected_donor")) +
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
-  scale_y_continuous( limits = c(-10000, 300500), labels = scales::comma) +
+  scale_y_continuous( limits = c(-10000, 300500), labels = scales::comma, breaks = c(300000, 200000, 100000)) +
   geom_hline(aes(yintercept=1200), colour = "gray50", size = 1, linetype=2)+
-  ylab(" Serum Anti-Toxin A IgG Titer")
+  ylab("Serum Anti-TcdA IgG Titer")
 one.B = donor.antitoxin.plot + 
   #eliminates background, gridlines and key border
   theme(
@@ -86,8 +86,8 @@ one.B = donor.antitoxin.plot +
     ,legend.background = element_blank ()
     ,legend.key = element_blank ()
     ,legend.position="none"  #if using this as a single figure change "none" to "top" or "bottom" and remove comment from the following 2 lines
-    ,axis.text.y=element_text(size=13)
-    ,axis.title.y=element_text(size=13)
+    ,axis.text.y=element_text(size=11)
+    ,axis.title.y=element_text(size=11)
     ,axis.title.x=element_blank()
     ,axis.text.x=element_blank()
     ,plot.margin = unit(c(1,1,2,1), "lines")
@@ -95,15 +95,19 @@ one.B = donor.antitoxin.plot +
 one.B
 
 #labeling the plot 
-#Creat text to lable plots 
+#Create text to lable plots 
 gtext.doninfect<-textGrob("Infected",gp = gpar(fontsize = 10))  
-gtext.donmock<-textGrob("Unifected", gp = gpar(fontsize = 10))  
+gtext.donmock<-textGrob("Unifected", gp = gpar(fontsize = 10))
+gtext.1200<-textGrob("1,200", gp=gpar(fontsize =11))
+gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 gtext.2star<-textGrob("**", gp = gpar(fontsize = 20)) 
 
 one.B= one.B + annotation_custom(gtext.2star, xmin = 1.5, xmax = 1.5,  ymin = 300300, ymax = 300350) +  #adding 2 stars for comparsion between infected vs mock 
   annotate("segment", x=1, xend=2, y = 300200, yend = 300200, colour = "black", size = 0.7) +
   annotation_custom(gtext.doninfect, xmin = 2, xmax = 2, ymin = -50000, ymax = -30000) +
-  annotation_custom(gtext.donmock, xmin = 1, xmax = 1, ymin  = -50000, ymax = -30000)
+  annotation_custom(gtext.donmock, xmin = 1, xmax = 1, ymin  = -50000, ymax = -30000) +
+  annotation_custom(gtext.1200, xmin =0.1, xmax= 0.1, ymin = 1300, ymax=1400) +
+  annotation_custom(gtext.lod, xmin =0.3, xmax= 0.3, ymin = 1300, ymax=1400)
 
 g1 = ggplotGrob(one.B)
 g1$layout$clip[g1$layout$name=="panel"] <- "off"
