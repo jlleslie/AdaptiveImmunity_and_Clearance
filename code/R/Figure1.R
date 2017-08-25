@@ -167,9 +167,9 @@ recipient.antitoxin.plot <-ggplot(recipient, aes(x=Treatment_2, y=AntitoxinA_IgG
   scale_color_manual(values = rep("black",3)) +
   scale_fill_manual(values = colors.recip, limits = c("infected_splenocytes", "vehicle")) +
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
-  scale_y_continuous( limits = c(-500, 4500)) +
+  scale_y_continuous( limits = c(-500, 4500), breaks = c(4000, 3000, 2000, 1000)) +
   geom_hline(aes(yintercept=50), colour = "gray50", size = 1, linetype=2)+
-  ylab(" Serum Anti-Toxin A IgG Titer")
+  ylab("Serum Anti-TcdA IgG Titer")
 one.D = recipient.antitoxin.plot + 
   #eliminates background, gridlines and key border and other changes to theme
   theme(
@@ -197,6 +197,8 @@ gtext.splenmock<-textGrob("Splenocytes\n(uninfected donor)", gp = gpar(fontsize 
 gtext.vhe<-textGrob("Vehicle",gp = gpar(fontsize = 10)) 
 gtext.star<-textGrob("*", gp = gpar(fontsize = 20)) 
 gtext.ns <-textGrob("ns", gp = gpar(fontsize = 13)) 
+gtext.50<-textGrob("50", gp=gpar(fontsize =11))
+gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 
 one.D = one.D+ annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=4275) +  #adding 2 stars for comparsion between splenocytes-infect vs vehicle 
   annotate("segment", x = 1, xend = 3, y = 4225, yend = 4225, colour = "black", size = 0.7) +
@@ -204,7 +206,9 @@ one.D = one.D+ annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=42
   annotate("segment", x = 2, xend = 3, y = 4500, yend = 4500, colour = "black", size = 0.7) +
   annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-1200, ymax=-1000) +
   annotation_custom(gtext.splenmock, xmin=2, xmax=2,  ymin=-1200, ymax=-1000) +
-  annotation_custom(gtext.vhe, xmin=1, xmax=1,ymin=-1200, ymax=-1000)
+  annotation_custom(gtext.vhe, xmin=1, xmax=1,ymin=-1200, ymax=-1000) +
+  annotation_custom(gtext.50, xmin =0.08, xmax= 0.08, ymin = 50, ymax=100) +
+  annotation_custom(gtext.lod, xmin =0.25, xmax= 0.25, ymin = 50, ymax=100)
 
 g2 = ggplotGrob(one.D)
 g2$layout$clip[g2$layout$name=="panel"] <- "off"
@@ -259,7 +263,7 @@ round(p.adjust(totigg_pvals, method = "BH"),3)
 #Plot data 
 
 #to clearly show points that were not detected (vs detected at LOD), change values to be below LOD line in the figure 
-#fill.in.lod = 1.032376
+#assay lod = 1.56
 #Because I had previously replaced 0 with the fill.in.lod I have to change that value to -500
 IgG$Total_IgG<-replace(IgG$Total_IgG, IgG$Total_IgG==fill.in.lod, -500) 
 #if you want to change the values again you will have to replace fill.in.lod with -500 etc. 
@@ -277,7 +281,7 @@ igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, fill=factor(Treatment_2)))
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
   geom_hline(aes(yintercept=1.56), colour = "grey50", size = 1, linetype=2) +
   scale_fill_manual(values = colors) +
-  scale_y_continuous( limits = c(-1000, 9000)) 
+  scale_y_continuous( limits = c(-1000, 9000), breaks = c(7500, 5000, 2500)) 
  
 one.C= igg.plot + 
   #eliminates background, gridlines and key border
@@ -307,7 +311,8 @@ gtext.splenmock<-textGrob("Splenocytes\n(uninfected donor)", gp = gpar(fontsize 
 gtext.vhe<-textGrob("Vehicle",gp = gpar(fontsize = 10)) 
 gtext.star<-textGrob("*", gp = gpar(fontsize = 20)) 
 gtext.ns <-textGrob("ns", gp = gpar(fontsize = 13)) 
-
+gtext.1<-textGrob("1", gp=gpar(fontsize =11))
+gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 
 one.C  = one.C  + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=8200) +  #adding single star for comparsion between splenocytes-infect vs vehicle 
           annotate("segment", x = 1, xend = 3, y = 8130, yend = 8130, colour = "black", size = 0.7) +
@@ -315,9 +320,11 @@ one.C  = one.C  + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=
           annotate("segment", x = 1, xend = 2, y = 8625, yend = 8650, colour = "black", size = 0.7) +
           annotation_custom(gtext.ns, xmin=2.5, xmax=2.5, ymin=9200, ymax=9300) + #adding ns for comparsion between splenocytes- uninfect vs plenocytes- uninfect
           annotate("segment", x = 2, xend =3, y = 8925, yend = 8950, colour = "black", size = 0.7)+
-           annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-2400, ymax=-2000) +
+          annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-2400, ymax=-2000) +
           annotation_custom(gtext.splenmock, xmin=2, xmax=2, ymin=-2400, ymax=-2000) +
           annotation_custom(gtext.vhe, xmin=1, xmax=1, ymin=-2400, ymax=-2000)
+          annotation_custom(gtext.1, xmin =0.08, xmax= 0.08, ymin = 1.56, ymax=3) +
+          annotation_custom(gtext.lod, xmin =0.25, xmax= 0.25, ymin = 1.56, ymax=3)
 
 g3 = ggplotGrob(one.C)
 g3$layout$clip[g$layout$name=="panel"] <- "off"
