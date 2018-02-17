@@ -3,7 +3,7 @@
 python tax_family.py family.taxonomy formatted.family.taxonomy
 '''
 # This script reformats the taxonomy files output by mothur to be more readable (helps with plot labels)
-
+# by Matt Jenior 
 import sys
 import re
 

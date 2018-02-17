@@ -1,4 +1,4 @@
-###Analysis for Figure 4: 
+###Analysis for Figure 1: 
 #Co-housing of RAG and WT mice 
 #Question can microbiota alone enable clearance 
 # Start with clean environment
@@ -16,11 +16,11 @@ for (dep in deps){
 rm(dep)
 
 setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-#Figure 4A
+#Figure 1A
 #Experiment outline drawn in illustrator 
 
 
-#Figure 4B 
+#Figure 2B 
 #Analysis of Co-housing Experiment
 shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
 shared$label<-NULL
@@ -85,7 +85,7 @@ print(median(anosim_pvalue))
 
 
 
-#Figure 4C
+#Figure 1C
 #Colonization overtime
 cfutime_data<-read.table(file='Colonization_Overtime_630_Allexperiments_copy.txt', header=TRUE)
 #Note the data is reported such that if no colonies were seen on the 10^-2 plate, that sample was reported as having 100 CFU/g feces ie the LOD 

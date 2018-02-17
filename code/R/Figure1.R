@@ -1,5 +1,5 @@
-#Analysis for "The role of adaptive immunity in Clostridium difficile clearance in a murine model of infection"
-# Figure 1: Results from adoptive transfer experiment
+#Analysis for "The gut microbiota is associated with clearance of Clostridium difficile infection independent of adaptive immunity"
+# Figure 2: Results from adoptive transfer experiment
 
 # Start with clean environment
 rm(list=ls())
@@ -10,13 +10,12 @@ library(ggplot2)
 library(grid)
 library(gtable)
 
-#Figure 1 A is a timeline drawn in illustrator 
 
 setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 #change this to where your file is located 
 
 ## Immune response to C. difficile (anti-toxin A IgG titers)
-# Data used to gernate figure 1B and 1D 
+# Data used to gernate figure 2A and 2C 
 
 #read in the data 
 antitoxin<-read.delim(file="AntitoxinA_IgGtiter_5ugmlcoat_Apri142017.txt")
@@ -29,7 +28,7 @@ donors<-antitoxin[antitoxin$Genotype=="WT", ]
 # this can be done  using  geneotype to do this
 
 
-### Donor Mouse Data  Figure 2B
+### Donor Mouse Data  Figure 1B
 
 #Statistics 
 #For the donor mice the LOD for this assay was a titer of 1200
@@ -73,7 +72,7 @@ donor.antitoxin.plot<-ggplot(donors, aes(x=Treatment_Grp, y=AntitoxinA_IgG_Titer
   scale_y_continuous( limits = c(-10000, 300500), labels = scales::comma, breaks = c(300000, 200000, 100000)) +
   geom_hline(aes(yintercept=1200), colour = "gray50", size = 1, linetype=2)+
   ylab("Serum Anti-TcdA IgG Titer")
-one.B = donor.antitoxin.plot + 
+two.A = donor.antitoxin.plot + 
   #eliminates background, gridlines and key border
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -92,7 +91,7 @@ one.B = donor.antitoxin.plot +
     ,axis.text.x=element_blank()
     ,plot.margin = unit(c(1,1,2,1), "lines")
   )
-one.B
+two.A
 
 #labeling the plot 
 #Create text to lable plots 
@@ -102,14 +101,14 @@ gtext.1200<-textGrob("1,200", gp=gpar(fontsize =11))
 gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 gtext.2star<-textGrob("**", gp = gpar(fontsize = 20)) 
 
-one.B= one.B + annotation_custom(gtext.2star, xmin = 1.5, xmax = 1.5,  ymin = 300300, ymax = 300350) +  #adding 2 stars for comparsion between infected vs mock 
+two.A= two.A + annotation_custom(gtext.2star, xmin = 1.5, xmax = 1.5,  ymin = 300300, ymax = 300350) +  #adding 2 stars for comparsion between infected vs mock 
   annotate("segment", x=1, xend=2, y = 300200, yend = 300200, colour = "black", size = 0.7) +
   annotation_custom(gtext.doninfect, xmin = 2, xmax = 2, ymin = -50000, ymax = -30000) +
   annotation_custom(gtext.donmock, xmin = 1, xmax = 1, ymin  = -50000, ymax = -30000) +
   annotation_custom(gtext.1200, xmin =0.1, xmax= 0.1, ymin = 1300, ymax=1400) +
   annotation_custom(gtext.lod, xmin =0.3, xmax= 0.3, ymin = 1300, ymax=1400)
 
-g1 = ggplotGrob(one.B)
+g1 = ggplotGrob(two.A)
 g1$layout$clip[g1$layout$name=="panel"] <- "off"
 grid.draw(g1)
 
@@ -163,14 +162,15 @@ recipient$Treatment_2<-factor(recipient$Treatment_2, levels = c("vehicle", "mock
 colors.recip<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3")
 #plot 
 recipient.antitoxin.plot <-ggplot(recipient, aes(x=Treatment_2, y=AntitoxinA_IgG_Titer,  fill= factor(Treatment_2), colour= factor(Treatment_2)))+ 
-  geom_dotplot(binaxis = "y", stackdir="center", dotsize = 1.3) +
+  #geom_dotplot(binaxis = "y", stackdir="center", dotsize = 1.3) +
+  geom_point(position= position_jitterdodge(jitter.width = NULL, jitter.height = 0, dodge.width = 0.75)) +
   scale_color_manual(values = rep("black",3)) +
   scale_fill_manual(values = colors.recip, limits = c("infected_splenocytes", "vehicle")) +
   stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
   scale_y_continuous( limits = c(-500, 4500), breaks = c(4000, 3000, 2000, 1000)) +
   geom_hline(aes(yintercept=50), colour = "gray50", size = 1, linetype=2)+
   ylab("Serum Anti-TcdA IgG Titer")
-one.D = recipient.antitoxin.plot + 
+two.D = recipient.antitoxin.plot + 
   #eliminates background, gridlines and key border and other changes to theme
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -189,7 +189,7 @@ one.D = recipient.antitoxin.plot +
     ,axis.text.x=element_blank()
     ,plot.margin = unit(c(1,1,2,1), "lines")
   )
-one.D #plots what you have so far
+two.D #plots what you have so far
 
 # Add in the lables for treatment groups outside of the plot
 gtext.spleninfect<-textGrob("Splenocytes\n(infected donor)", gp = gpar(fontsize = 10))  
@@ -200,7 +200,7 @@ gtext.ns <-textGrob("ns", gp = gpar(fontsize = 13))
 gtext.50<-textGrob("50", gp=gpar(fontsize =11))
 gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 
-one.D = one.D+ annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=4275) +  #adding 2 stars for comparsion between splenocytes-infect vs vehicle 
+two.D = two.D+ annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=4275) +  #adding 2 stars for comparsion between splenocytes-infect vs vehicle 
   annotate("segment", x = 1, xend = 3, y = 4225, yend = 4225, colour = "black", size = 0.7) +
   annotation_custom(gtext.2star, xmin=2.5, xmax=2.5, ymin=4500, ymax=4550) +  #adding 2 stars for comparsion between splenocytes- uninfect vs vehicle 
   annotate("segment", x = 2, xend = 3, y = 4500, yend = 4500, colour = "black", size = 0.7) +
@@ -210,7 +210,7 @@ one.D = one.D+ annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=42
   annotation_custom(gtext.50, xmin =0.08, xmax= 0.08, ymin = 50, ymax=100) +
   annotation_custom(gtext.lod, xmin =0.25, xmax= 0.25, ymin = 50, ymax=100)
 
-g2 = ggplotGrob(one.D)
+g2 = ggplotGrob(two.D)
 g2$layout$clip[g2$layout$name=="panel"] <- "off"
 grid.draw(g2)
 
@@ -283,7 +283,7 @@ igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, fill=factor(Treatment_2)))
   scale_fill_manual(values = colors) +
   scale_y_continuous( limits = c(-1000, 9000), breaks = c(7500, 5000, 2500)) 
  
-one.C= igg.plot + 
+two.C= igg.plot + 
   #eliminates background, gridlines and key border
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -302,8 +302,8 @@ one.C= igg.plot +
     ,axis.text.x=element_blank()
     ,plot.margin = unit(c(1,1,2,1), "lines")
   )
-one.C  = one.C + labs(y = "Serum IgG ng/ml")
-one.C 
+two.C  = two.C + labs(y = "Serum IgG ng/ml")
+two.C 
 
 # Add in the lables for treatment groups outside of the plot
 gtext.spleninfect<-textGrob("Splenocytes\n(infected donor)", gp = gpar(fontsize = 10))  
@@ -314,7 +314,7 @@ gtext.ns <-textGrob("ns", gp = gpar(fontsize = 13))
 gtext.1<-textGrob("1", gp=gpar(fontsize =11))
 gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
 
-one.C  = one.C  + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=8200) +  #adding single star for comparsion between splenocytes-infect vs vehicle 
+two.C  = two.C  + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=8200) +  #adding single star for comparsion between splenocytes-infect vs vehicle 
           annotate("segment", x = 1, xend = 3, y = 8130, yend = 8130, colour = "black", size = 0.7) +
           annotation_custom(gtext.star, xmin=1.5, xmax=1.5, ymin=8700, ymax=8750) +  #adding single star for comparsion between splenocytes- uninfect vs vehicle 
           annotate("segment", x = 1, xend = 2, y = 8625, yend = 8650, colour = "black", size = 0.7) +
@@ -326,7 +326,7 @@ one.C  = one.C  + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=
           annotation_custom(gtext.1, xmin =0.08, xmax= 0.08, ymin = 1.56, ymax=3) +
           annotation_custom(gtext.lod, xmin =0.25, xmax= 0.25, ymin = 1.56, ymax=3)
 
-g3 = ggplotGrob(one.C)
+g3 = ggplotGrob(two.C)
 g3$layout$clip[g$layout$name=="panel"] <- "off"
 grid.draw(g3)
 
