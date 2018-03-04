@@ -19,7 +19,7 @@ rm(dep)
 setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
 
 
-#Figure 1A
+#######Figure 1A
 #Analysis of Co-housing Experiment, community after co-housing but before (abx day -15) RAG vs WT mice 
 shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
 shared$label<-NULL
@@ -78,7 +78,7 @@ print(median(anosim_pvalue))
 
 
 
-#Figure 1B
+#######Figure 1B
 #Colonization overtime in co-housed RAGko and WT mice 
 
 cfutime_data<-read.table(file='Colonization_Overtime_630_Allexperiments_copy.txt', header=TRUE)
@@ -163,18 +163,30 @@ b2 = b1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype
 b3 = b2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 b3
 
+
 cfutime_data.infected$CFU_g<-replace(cfutime_data.infected$CFU_g,cfutime_data.infected$CFU_g==100,fill.in.lod)
 #replace placed holder LOD values with LOD/squareroot(2) 
-d40.f<-cfutime_data.infected[cfutime_data.infected$Day == "40" & cfutime_data.infected$Gender=="female",11]
-d40.m<-cfutime_data.infected[cfutime_data.infected$Day == "40" & cfutime_data.infected$Gender=="male",11]
-#note the group that cleared were male and while the female groups remained colonized
-wilcox.test(d40.f, d40.m)
-#data:  d40.f and d40.m
-#W = 72, p-value = 0.0002166
+#Statics 
+cfutime_data.infected.D40<-cfutime_data.infected[cfutime_data.infected$Day == "40",]
+
+kruskal.test(cfutime_data.infected.D40$CFU_g~ cfutime_data.infected.D40$Cage)
+
+
+PT = pairwise.wilcox.test(cfutime_data.infected.D40$CFU_g, 
+                          cfutime_data.infected.D40$Cage, 
+                          p.adjust.method="BH")
+#using be Benjamini & Hochberg  for p-value correction 
+PT
+#data:  cfutime_data.infected.D40$CFU_g and cfutime_data.infected.D40$Cage 
+
+        #16    18    977  
+#   18  0.026 -     -    
+#  977 0.026 0.886 -    
+#  978 -     0.026 0.026
 
 
 
-#Figure 1C
+######Figure 1C
 #Analysis of Co-housing Experiment, before abx by co-housing group not gneotype 
 shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
 shared$label<-NULL

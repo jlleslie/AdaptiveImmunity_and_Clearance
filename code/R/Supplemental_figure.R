@@ -7,7 +7,7 @@ library(ggplot2)
 library(grid)
 library(scales)
 library(vegan)
-
+library(gtable)
 # Modified from soure of function: http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/
 ## Gives count, first quartile, median and thrid quartile 
 ##   data: a data frame.
@@ -37,7 +37,7 @@ summaryMED<-function(data=NULL, measurevar, metadata=NULL, na.rm=FALSE, .drop=TR
   return(data1)
 }
 
-# Supp Figure 1: Colonization in WT donor mice. 
+############# Supp Figure 1A: Colonization in WT donor mice. 
 donor.col<-read.delim(file= "Adoptivetransfer_donor_colonization.txt", header = T)
 #Replace the 100 in the mice that actually had undectable levles with LOD/squarroot of 2
 #the LOD is 100 
@@ -54,7 +54,7 @@ donor.plot<-ggplot(donor.col.med, aes(x=Day, y= CFU_g, group=Cage, color=factor(
   geom_line(size=0.9) 
 
 #theme with white background
-SA1 = donor.plot+ 
+S1A = donor.plot+ 
   #eliminates background, gridlines and key border
   theme(
     panel.background = element_rect(fill = "white", color = "grey80", size = 2)
@@ -69,99 +69,112 @@ SA1 = donor.plot+
     ,axis.title.x=element_blank()
     ,axis.text.x=element_text(size=11)
   )
-SA1 = SA1 + labs(y = "CFU per Gram Feces")
-SA2 = SA1 + geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
-SA3 = SA2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
-SA3
+S1A = S1A + labs(y = "CFU per Gram Feces")
+S1A = S1A + geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
+S1A = S1A + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
+S1A
 
-#Supp Figure 2: Total IgG By Cage 
-IgG<-read.delim(file="TotalIgG_April_5_2017.txt", header = T)
-#replacing cage 150 with 150A because these 
-#Plotting the data 
-#to clearly show points that were not detected (vs detected at LOD), change values to be below LOD line in the figure 
-IgG$Total_IgG<-replace(IgG$Total_IgG, IgG$Total_IgG==0, -500) 
-#if you want to change the values again you will have to replace fill.in.lod with -500 etc. 
+############# Supp Figure 1B: Anti-C difficile toxin A titer in donor mice 
+#read in the data 
+antitoxin<-read.delim(file="AntitoxinA_IgGtiter_5ugmlcoat_Apri142017.txt")
+# Any sample that did not have a detectable titer was given a value of 0 
+# One mouse did not have sample to test and therefore got a value of NA 
+#Pull out anti-toxin A IgG data for recipient mice and donor mice
+recipient<-antitoxin[antitoxin$Genotype=="RAG", ]
+donors<-antitoxin[antitoxin$Genotype=="WT", ]
+# this can be done  using  geneotype to do this
 
-#assign colors to different treatment groups
-colors<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3")
+#Statistics 
+#For the donor mice the LOD for this assay was a titer of 1200
+#For the purpose of stats set 0 values (ie values that no titer was detected) to LOD of 1200 divided by sqare root of 2 
+fill.in.lod<-1200/sqrt(2) #fill.in.lod= 848.5281
+#Replace 0 with fill in LOD 
+donors$AntitoxinA_IgG_Titer<-replace(donors$AntitoxinA_IgG_Titer,donors$AntitoxinA_IgG_Titer==0,fill.in.lod)
+#Testing if values from each group are from distint distributions
+#Pull out Anti-toxin IgG  measured in recpient mice that got splenocytes from infected donors 
+donor.infect<-donors[donors$Treatment_1=="630",]
+donor.infect_AntiAigg<-c(donor.infect$AntitoxinA_IgG_Titer)
+#Pull out total IgG measured in mice that got splenocytes from uninfected donors 
+donor.mock<-donors[donors$Treatment_1=="mock",]
+donor.mock_AntiAigg<-c(donor.mock$AntitoxinA_IgG_Titer)
+wilcox.test(donor.infect_AntiAigg, donor.mock_AntiAigg, exact=F)
+#data:  donor.infect_AntiAigg and donor.mock_AntiAigg
+#W = 20, p-value = 0.009277
+#alternative hypothesis: true location shift is not equal to 0
+#No correction is required because there is only one comparison 
 
-##order the dataset so that it will plot vehicle first on the left
-IgG$Treatment_2<-factor(IgG$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
-shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =25, "150" =7 , "150A" =8)
-#Make a jitter plot of the data 
-igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, color=factor(Treatment_2), fill=factor(Treatment_2),shape=factor(Cage)))+ 
-  scale_shape_manual(values= shape_cage)+
-  geom_jitter(width = 0.2, height = 0.01, size= 5)+
-  scale_color_manual(values = colors) +
-  scale_fill_manual(values = colors) +
-  geom_hline(aes(yintercept=1.56), colour = "grey50", size = 1, linetype=2)
+#to make it clear that the values that were not detected vs the values that were detected at the LOD I will replace the fill.in.lod= 848.5281 with -1000
+donors$AntitoxinA_IgG_Titer<-replace(donors$AntitoxinA_IgG_Titer, donors$AntitoxinA_IgG_Titer==fill.in.lod, -10000) 
 
-two.B = igg.plot + 
+#plotting
+#order the dataset so that it will plot vehicle first on the left
+donors$Treatment_Grp<-factor(donors$Treatment_Grp, levels = c("uninfected_donor", "630_infected_donor"))
+#assign colors
+colors.don<-c("uninfected_donor"="grey", "630_infected_donor"="black")
+#plot
+donor.antitoxin.plot<-ggplot(donors, aes(x=Treatment_Grp, y=AntitoxinA_IgG_Titer, fill= factor(Treatment_Grp), color=factor(Treatment_Grp)))+ 
+  geom_dotplot(binaxis = "y", stackdir="center", dotsize = 1.3) +
+  scale_color_manual(values = rep("black",2)) +
+  scale_fill_manual(values = colors.don, limits = c("uninfected_donor", "630_infected_donor")) +
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
+  scale_y_continuous( limits = c(-10000, 300500), labels = scales::comma, breaks = c(300000, 200000, 100000)) +
+  geom_hline(aes(yintercept=1200), colour = "gray50", size = 1, linetype=2)+
+  ylab("Serum Anti-TcdA IgG Titer")
+S1B = donor.antitoxin.plot + 
   #eliminates background, gridlines and key border
-  theme_bw()
-two.B  = two.B + labs(y = "Serum IgG ng/ml")
-two.B 
+  theme(
+    panel.background = element_rect(fill = "white", color = "grey80", size = 2)
+    ,panel.grid.major = element_line(color = "gray90", size = 0.6)
+    ,panel.grid.major.x = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,axis.ticks= element_line(size = 0.6, colour = "grey90")
+    ,axis.ticks.length = unit(0.2, "cm")
+    ,legend.title=element_blank()
+    ,legend.background = element_blank ()
+    ,legend.key = element_blank ()
+    ,legend.position="none"  #if using this as a single figure change "none" to "top" or "bottom" and remove comment from the following 2 lines
+    ,axis.text.y=element_text(size=11)
+    ,axis.title.y=element_text(size=11)
+    ,axis.title.x=element_blank()
+    ,axis.text.x=element_blank()
+    ,plot.margin = unit(c(1,1,2,1), "lines")
+  )
+S1B
+#labeling the plot 
+#Create text to lable plots 
+gtext.doninfect<-textGrob("Infected",gp = gpar(fontsize = 10))  
+gtext.donmock<-textGrob("Unifected", gp = gpar(fontsize = 10))
+gtext.1200<-textGrob("1,200", gp=gpar(fontsize =11))
+gtext.lod<-textGrob("(LOD)", gp=gpar(fontsize =11))
+gtext.2star<-textGrob("**", gp = gpar(fontsize = 20)) 
+
+S1B.A= S1B + annotation_custom(gtext.2star, xmin = 1.5, xmax = 1.5,  ymin = 300300, ymax = 300350) +  #adding 2 stars for comparsion between infected vs mock 
+  annotate("segment", x=1, xend=2, y = 300200, yend = 300200, colour = "black", size = 0.7) +
+  annotation_custom(gtext.doninfect, xmin = 2, xmax = 2, ymin = -50000, ymax = -30000) +
+  annotation_custom(gtext.donmock, xmin = 1, xmax = 1, ymin  = -50000, ymax = -30000) +
+  annotation_custom(gtext.1200, xmin =0.1, xmax= 0.1, ymin = 1300, ymax=1400) +
+  annotation_custom(gtext.lod, xmin =0.3, xmax= 0.3, ymin = 1300, ymax=1400)
+
+g1 = ggplotGrob(S1B.A)
+g1$layout$clip[g1$layout$name=="panel"] <- "off"
+grid.draw(g1)
 
 
 
-#Supp figure3: MDS of RAG and WT mice co-housed (figure 4B, but analyzed by genotype )
-shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header=T)
-shared$label<-NULL
-shared$numOtus<-NULL
-meta.data<-read.delim(file="Adaptiveimmuneclear_metadata_noD40.42.tsv", header=T, row.names = 1)
-meta.data.coho<-meta.data[meta.data$Year=="2014" & meta.data$Treatment_1=="630",]
-meta.data.coho.dneg15<-meta.data.coho[meta.data.coho$Day=="-15" & meta.data.coho$Mouse!="181",]
-#Exluded mouse 18-1 because it died during the course of the experiment 
-samples<-row.names(meta.data.coho.dneg15)
-coho.shared<-shared[shared$Group %in% samples,]
-row.names(coho.shared)<-coho.shared$Group
-coho.shared$Group=NULL
-
-#Making MDS plot of groups of co-housed mice 
-#Generate the MDS 
-metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$stress
-#Stress =  0.1864309 
-Dneg15_nmds <- metaMDS(coho.shared, distance = "bray",k=2, trymax=100)$points
-Dneg15_nmds_meta<-merge(Dneg15_nmds,meta.data, by= 'row.names')
-row.names(Dneg15_nmds_meta)<-Dneg15_nmds_meta$Row.names
-Dneg15_nmds_meta$Row.names<-NULL
-#reassigns row.names 
-##MDS by genoytpe 
 
 
-#pulling out points for each co-housing grouping 
-pts.RAG<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="16" | Dneg15_nmds_meta$Cage =="18", 1:2]
-pts.WT<-Dneg15_nmds_meta[Dneg15_nmds_meta$Cage =="978" |  Dneg15_nmds_meta$Cage =="977", 1:2]
-coho.shared$Cage=coho.shared$Genotype
-coho.shared$Genotype<-c(rep("RAG1KO",8), rep("WT",9))
-Dneg15.cent.nmds<-Dneg15_nmds_meta
-RAG<- Dneg15.cent.nmds[Dneg15.cent.nmds$Genotype=="RAG1KO", 1:2]
-Dneg15nmdsgeno_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$MDS2)~ Dneg15.cent.nmds$Genotype, data=Dneg15.cent.nmds, mean)
-#Plotting the values 
-plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
-     xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
-box(which = "plot", lty = "solid", col ="grey80", lwd=5)
-axis(side = 2, col="grey80", las=1)
-axis(side = 1, col="grey80", las=1)
-points(pts.RAG, pch=21, bg='white', cex=2)
-points(pts.WT, pch=21, bg='black', cex=2)
-segments(x0=pts.WT$MDS1, y0=pts.WT$MDS2, x1=Dneg15nmdsgeno_centroids[2,2], y1=Dneg15nmdsgeno_centroids[2,3], col='gray30')
-segments(x0=pts.RAG$MDS1, y0=pts.RAG$MDS2, x1=Dneg15nmdsgeno_centroids[1,2], y1=Dneg15nmdsgeno_centroids[1,3], col='gray30')
-points(0.31,0.26, pch=21, bg='white', cex=2)
-points(0.31,0.23, pch=21, bg='black', cex=2)
-text(0.31, 0.26, labels = c("RAG1KO"), pos=2)
-text(0.31, 0.23, labels = c("WT"), pos=2)
-text(0.31,-0.16, labels = c("p = 0.085"), pos=2)
-text(0.31,-0.13, labels = c("R: 0.1224"), pos=2)
 
 
-#Stats
-anosim_pvalue <- c()
-for (i in 1:100){
-  anosim_pvalue[i] <- anosim(coho.shared[,1:660], coho.shared$Genotype, permutations=999, distance='bray')$signif
-  print(i)
-}
-print(median(anosim_pvalue))
+
+
+
+
+
+
+
+
+
+
 
 
 #Supp figure 4: Colonization of other mice included in Random Forest 
@@ -220,6 +233,83 @@ SB2 = SB1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linety
 SB3 = SB2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 SB3
 
+
+
+#read in the data 
+antitoxin<-read.delim(file="AntitoxinA_IgGtiter_5ugmlcoat_Apri142017.txt")
+# Any sample that did not have a detectable titer was given a value of 0 
+# One mouse did not have sample to test and therefore got a value of NA 
+
+#Pull out anti-toxin A IgG data for recipient mice and donor mice
+recipient<-antitoxin[antitoxin$Genotype=="RAG", ]
+donors<-antitoxin[antitoxin$Genotype=="WT", ]
+# this can be done  using  geneotype to do this
+
+
+### Donor Mouse Data  Figure 1B
+
+#Statistics 
+#For the donor mice the LOD for this assay was a titer of 1200
+#For the purpose of stats set 0 values (ie values that no titer was detected) to LOD of 1200 divided by sqare root of 2 
+fill.in.lod<-1200/sqrt(2) #fill.in.lod= 848.5281
+#Replace 0 with fill in LOD 
+donors$AntitoxinA_IgG_Titer<-replace(donors$AntitoxinA_IgG_Titer,donors$AntitoxinA_IgG_Titer==0,fill.in.lod)
+#Testing if values from each group are from distint distributions
+#Pull out Anti-toxin IgG  measured in recpient mice that got splenocytes from infected donors 
+donor.infect<-donors[donors$Treatment_1=="630",]
+donor.infect_AntiAigg<-c(donor.infect$AntitoxinA_IgG_Titer)
+#Pull out total IgG measured in mice that got splenocytes from uninfected donors 
+donor.mock<-donors[donors$Treatment_1=="mock",]
+donor.mock_AntiAigg<-c(donor.mock$AntitoxinA_IgG_Titer)
+
+
+wilcox.test(donor.infect_AntiAigg, donor.mock_AntiAigg, exact=F)
+#data:  donor.infect_AntiAigg and donor.mock_AntiAigg
+#W = 20, p-value = 0.009277
+#alternative hypothesis: true location shift is not equal to 0
+
+#No correction is required because there is only one comparison 
+
+
+#to make it clear that the values that were not detected vs the values that were detected at the LOD I will replace the fill.in.lod= 848.5281 with -1000
+donors$AntitoxinA_IgG_Titer<-replace(donors$AntitoxinA_IgG_Titer, donors$AntitoxinA_IgG_Titer==fill.in.lod, -10000) 
+
+#plotting
+
+#order the dataset so that it will plot vehicle first on the left
+donors$Treatment_Grp<-factor(donors$Treatment_Grp, levels = c("uninfected_donor", "630_infected_donor"))
+
+#assign colors
+colors.don<-c("uninfected_donor"="grey", "630_infected_donor"="black")
+#plot
+donor.antitoxin.plot<-ggplot(donors, aes(x=Treatment_Grp, y=AntitoxinA_IgG_Titer, fill= factor(Treatment_Grp), color=factor(Treatment_Grp)))+ 
+  geom_dotplot(binaxis = "y", stackdir="center", dotsize = 1.3) +
+  scale_color_manual(values = rep("black",2)) +
+  scale_fill_manual(values = colors.don, limits = c("uninfected_donor", "630_infected_donor")) +
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
+  scale_y_continuous( limits = c(-10000, 300500), labels = scales::comma, breaks = c(300000, 200000, 100000)) +
+  geom_hline(aes(yintercept=1200), colour = "gray50", size = 1, linetype=2)+
+  ylab("Serum Anti-TcdA IgG Titer")
+two.A = donor.antitoxin.plot + 
+  #eliminates background, gridlines and key border
+  theme(
+    panel.background = element_rect(fill = "white", color = "grey80", size = 2)
+    ,panel.grid.major = element_line(color = "gray90", size = 0.6)
+    ,panel.grid.major.x = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,axis.ticks= element_line(size = 0.6, colour = "grey90")
+    ,axis.ticks.length = unit(0.2, "cm")
+    ,legend.title=element_blank()
+    ,legend.background = element_blank ()
+    ,legend.key = element_blank ()
+    ,legend.position="none"  #if using this as a single figure change "none" to "top" or "bottom" and remove comment from the following 2 lines
+    ,axis.text.y=element_text(size=11)
+    ,axis.title.y=element_text(size=11)
+    ,axis.title.x=element_blank()
+    ,axis.text.x=element_blank()
+    ,plot.margin = unit(c(1,1,2,1), "lines")
+  )
+two.A
 
 #Supp Figure 5: Relative Abundace of OTU 3(Akkermansia)
 
