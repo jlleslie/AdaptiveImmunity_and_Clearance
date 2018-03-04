@@ -1,6 +1,7 @@
 ###Analysis for Figure 1: 
 #Co-housing of RAG and WT mice 
-#Question can microbiota alone enable clearance 
+# Experiment Question: Is adaptive immunity required for clearance of C. difficile? 
+
 # Start with clean environment
 rm(list=ls())
 gc()
