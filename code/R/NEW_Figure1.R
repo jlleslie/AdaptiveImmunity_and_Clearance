@@ -78,6 +78,7 @@ print(median(anosim_pvalue))
 
 
 
+
 #######Figure 1B
 #Colonization overtime in co-housed RAGko and WT mice 
 
@@ -163,27 +164,21 @@ b2 = b1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype
 b3 = b2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 b3
 
-
 cfutime_data.infected$CFU_g<-replace(cfutime_data.infected$CFU_g,cfutime_data.infected$CFU_g==100,fill.in.lod)
 #replace placed holder LOD values with LOD/squareroot(2) 
 #Statics 
 cfutime_data.infected.D40<-cfutime_data.infected[cfutime_data.infected$Day == "40",]
-
 kruskal.test(cfutime_data.infected.D40$CFU_g~ cfutime_data.infected.D40$Cage)
-
-
-PT = pairwise.wilcox.test(cfutime_data.infected.D40$CFU_g, 
+pairwise.wilcox.test(cfutime_data.infected.D40$CFU_g, 
                           cfutime_data.infected.D40$Cage, 
                           p.adjust.method="BH")
 #using be Benjamini & Hochberg  for p-value correction 
-PT
 #data:  cfutime_data.infected.D40$CFU_g and cfutime_data.infected.D40$Cage 
 
         #16    18    977  
 #   18  0.026 -     -    
 #  977 0.026 0.886 -    
 #  978 -     0.026 0.026
-
 
 
 ######Figure 1C

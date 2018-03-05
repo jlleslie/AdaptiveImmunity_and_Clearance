@@ -60,7 +60,7 @@ vehicle.igg.med<- median(IgG[IgG$Treatment_2=="vehicle",11])
 #Make a jitter plot of the data 
 igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, color=factor(Treatment_2), fill=factor(Treatment_2),shape=factor(Cage)))+ 
   scale_shape_manual(values= shape_cage)+
-  geom_jitter(width = 0.35, height = 0.01, size= 5)+
+  geom_jitter(width = 0.4, height = 0.01, size= 5)+
   scale_color_manual(values = colors) +
   scale_fill_manual(values = colors) +
   scale_y_continuous(limits = c(-1000, 9000), labels = scales::comma, breaks = c(8000, 6000, 4000, 2000)) +
@@ -100,9 +100,9 @@ fig2A = fig2A + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=82
   annotate("segment", x = 1, xend = 2, y = 8625, yend = 8650, colour = "black", size = 0.7) +
   annotation_custom(gtext.ns, xmin=2.5, xmax=2.5, ymin=9200, ymax=9300) + #adding ns for comparsion between splenocytes- uninfect vs splenocytes- infect
   annotate("segment", x = 2, xend =3, y = 8925, yend = 8950, colour = "black", size = 0.7)+
-  annotate("segment", x=0.8, xend=1.2, y=vehicle.igg.med, yend=vehicle.igg.med, color="grey50", size=1) +
-  annotate("segment", x=1.8, xend=2.2, y=infected_splenocytes.igg.med, yend=infected_splenocytes.igg.med, color="grey50", size=1) +
-  annotate("segment", x=2.8, xend=3.2, y=mock_splenocytes.igg.med, yend=mock_splenocytes.igg.med, color="grey50", size=1)+ 
+  annotate("segment", x=0.8, xend=1.4, y=vehicle.igg.med, yend=vehicle.igg.med, color="grey50", size=1) +
+  annotate("segment", x=1.8, xend=2.4, y=infected_splenocytes.igg.med, yend=infected_splenocytes.igg.med, color="grey50", size=1) +
+  annotate("segment", x=2.8, xend=3.4, y=mock_splenocytes.igg.med, yend=mock_splenocytes.igg.med, color="grey50", size=1)+ 
   #the three segments above draw in median lines for each group 
    annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-2400, ymax=-2000) +
   annotation_custom(gtext.splenmock, xmin=2, xmax=2, ymin=-2400, ymax=-2000) +
@@ -306,8 +306,6 @@ g3$layout$clip[g3$layout$name=="panel"] <- "off"
 grid.draw(g3)
 
 
-
-
 ###Figure 2d
 ## Colonication at the end of the experiment 
 
@@ -347,7 +345,7 @@ shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =13, "150" =9 , "1
 d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Treatment_2), fill=factor(Treatment_2), shape=factor(Cage)))+ 
   #stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
   scale_shape_manual(values= shape_cage)+
-  geom_jitter(width = 0.2, height = 0.01, size= 5)+
+  geom_jitter(width = 0.35, height = 0.01, size= 5)+
   scale_color_manual(values = colors) +
   scale_fill_manual(values = colors)+
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)), limits=c(10,4*10^8)) +
