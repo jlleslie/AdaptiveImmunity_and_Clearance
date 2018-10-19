@@ -15,7 +15,7 @@ for (dep in deps){
 }
 rm(dep)
 
-setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+setwd("~/Desktop/repos/AdaptiveImmunity_and_Clearance/data")
 ## Figure 4A: Bray-Curtis Dissimparity between Before Abx to D21 post Infection
 #Read in filted and subsampled shared file this file has more data than is used for this analysis 
 otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header = T)
@@ -275,8 +275,8 @@ row.names(D21.shared) = D21.shared$Group
 D21.shared$label <- NULL
 D21.shared$Group <- NULL
 D21.shared$numOtus <- NULL
-D21.shared.log<- log10(D21.shared + 1)
-#calcs Log10 transformed shared 
+#D21.shared.log<- log10(D21.shared + 1) #calcs Log10 transformed shared 
+D21.shared.log<- (D21.shared / rowSums(D21.shared)) * 100 # percent of community
 
 lefse.D21.shared.log<-D21.shared.log[ ,as.vector(lefse.otus$OTU)]
 #filters shared file down to top 10 OTUs with highest LDA values
@@ -375,9 +375,11 @@ for (index in 1:length(pval.all)) {
 
 #Plotting
 #plotting relative abundaces on log scale 
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=4)
+
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
-plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,4), 
-     ylab='', xlab='Relative Abundance', xaxt='n', yaxt='n', cex.lab=1.2)
+plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,60), 
+     ylab='', xlab='Relative Abundance (%)', yaxt='n', cex.lab=1.2)
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
 index <- 1
 for(i in colnames(lefse.neg.tax.lda)){
@@ -392,21 +394,13 @@ for(i in colnames(lefse.neg.tax.lda)){
   segments(median(lefse.pos.tax.lda[,i]), index-0.6, median(lefse.pos.tax.lda[,i]), index-0.1, lwd=2.5)
   index <- index + 2
 }
-
-axis(side=1, at=c(0:4), label=c('0','0.01','1','10',"100"), cex.axis=1.2, tck=-0.02, col="grey50", col.ticks ="grey50")
-minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98)
-axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", col.ticks ="grey50")
-
 legend('bottomright', legend=c('Vehicle', 'IgG Positive'),
        pch=c(21, 21), pt.bg=c('grey','grey20'), bg='white', pt.cex=1.4, cex=0.5)
 axis(2, at=seq(1,index-2,2)+0.5, labels=colnames(lefse.neg.tax.lda), las=1, line=-0.5, tick=F, cex.axis=1,col="grey80", col.ticks = "grey60")
 italic_p <- lapply(1:length(pval.all), function(x) bquote(paste(italic('p'), .(pval.all[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.5, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, font=3,cex.axis=0.8) 
 
-
+dev.off()
 
 
 
