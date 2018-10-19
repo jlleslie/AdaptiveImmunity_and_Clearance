@@ -1,6 +1,6 @@
-###Analysis for Figure 1: 
-#Co-housing of RAG and WT mice 
-#Question can microbiota alone enable clearance 
+###Analysis for Figure 4: 
+#Analysis of the gut bacterial community of reconstituted RAG1 mice 
+
 # Start with clean environment
 rm(list=ls())
 gc()
@@ -16,7 +16,7 @@ for (dep in deps){
 rm(dep)
 
 setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-## Figure 3B: Bray-Curtis Dissimparity between Before Abx to D21 post Infection
+## Figure 4A: Bray-Curtis Dissimparity between Before Abx to D21 post Infection
 #Read in filted and subsampled shared file this file has more data than is used for this analysis 
 otu.shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared", header = T)
 otu.shared$label<-NULL
@@ -253,7 +253,7 @@ grid.draw(g.4B)
 
 
 
-##Figure 4 Finding OTUS that discriminate IgG+ vs IgG- (vehicle) mice
+##Figure 4C Finding OTUS that discriminate IgG+ vs IgG- (vehicle) mice
 #For this analysis, using mothur version 1.39.0, from the shared file "Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared,"
 #The shared file had already been subsampled to 10,000 sequences and then filtered so that each OTU was in at least 6 samples (lowest group n)
 #I pulled out D21 samples the shared file except for samples 1433D21 and 1444D21 because they didn't have IgG despite getting splenocytes
