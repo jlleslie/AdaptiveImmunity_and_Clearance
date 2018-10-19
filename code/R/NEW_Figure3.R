@@ -16,7 +16,7 @@ for (dep in deps){
 }
 rm(dep)
 
-#####Figure 3A 
+#####Figure 3
 #### MDS of D1 communites, after infection before transfer of spleen cells  
 
 #Read in filted and subsampled shared file this file has more data than is used for this analysis 
