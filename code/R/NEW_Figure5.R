@@ -195,6 +195,8 @@ colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
 
 #--------------------------------------------------------------------#
 
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_S3.pdf', width=8, height=6)
+
 # Supplementary plot of entire community Random Forest results
 # Set up plotting environment
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
@@ -242,11 +244,13 @@ axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01)
 legend('topright', legend=c('Cleared', 'Colonized'),
       pch=c(21, 21), pt.bg=c('deeppink','darkblue'), bg='white', pt.cex=2, cex=1.1)
 axis(2, at=seq(1,index-2,2)+0.6, labels=toupper(rownames(preabx_importances)), las=1, line=-0.5, tick=F, cex.axis=1.4)
-formatted_taxa <- lapply(1:nrow(preabx_importances), function(x) bquote(paste(.(preabx_importances$phylum[x]),'; ',italic(.(preabx_importances$genus[x])), sep='')))
-axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.1, font=3) 
+formatted_taxa <- lapply(1:nrow(preabx_importances), function(x) bquote(paste(.(preabx_importances$phylum[x]),'; ', .(preabx_importances$genus[x]), sep='')))
+axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, line=-0.5, tick=F, cex.axis=1.3, font=3) 
 italic_p <- lapply(1:length(preabx_importances$pvalues), function(x) bquote(paste(italic('p'), .(preabx_importances$pvalues[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
 mtext('B', side=2, line=2, las=2, adj=13, padj=-17, cex=1.7)
+
+dev.off()
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
 
