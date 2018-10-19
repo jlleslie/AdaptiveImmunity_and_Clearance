@@ -16,11 +16,10 @@ rm(dep)
 
 # Define data files
 #setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-setwd("~/Desktop/repos/clearance_2017/data")
+setwd("~/Desktop/repos/AdaptiveImmunity_and_Clearance/data")
 metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
 shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
-
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -262,7 +261,7 @@ legend('topleft', legend=c('Cleared','Colonized'), pt.bg=c('white','gray'),
 segments(x0=c(1.25,3.25), y0=c(2,2.8),
       x1=c(2.05,4.05), y1=c(2,2.8),
       lwd=1.5)
-text(x=c(1.65,3.65), y=c(2.15,2.95), c('*','*'), font=2, cex=2)
+text(x=c(1.65,3.65), y=c(2.15,2.95), c('***','*'), font=2, cex=1.8)
 mtext(c('OTU 52','OTU 93'), side=1, at=c(1.6,3.6), padj=0.5, cex=1.4)
 mtext(c('(MDA: 0.097)','(MDA: 0.175)'), side=1, at=c(1.6,3.6), padj=2.5, cex=0.9)
 box(lwd=3, col='gray')
