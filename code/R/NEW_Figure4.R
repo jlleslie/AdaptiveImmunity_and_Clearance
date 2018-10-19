@@ -375,7 +375,8 @@ for (index in 1:length(pval.all)) {
 
 #Plotting
 #plotting relative abundaces on log scale 
-pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=4)
+tiff(filename='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.tiff', 
+     width=600, height=400)
 
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
 plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,60), 
