@@ -15,12 +15,10 @@ for (dep in deps){
 rm(dep)
 
 # Define data files
-setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-#setwd("~/Desktop/Repositories/clearance_2017/data")
+setwd("~/Desktop/repos/AdaptiveImmunity_and_Clearance/data")
 metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
 shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
-
 
 # Read in data and eliminate extra columns
 metadata <- read.delim(metadata, sep='\t', header=T, row.names=1)
@@ -87,9 +85,12 @@ temp$Colonization_stat630 <- NULL
 cleared_preabx_rf <- randomForest(test~., data=temp, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 rm(temp, test, trees, tries)
-preabx_accuracy <- paste('Accuracy = ',as.character( (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))),'%',sep='')
-#preabx_accuracy <- 'Accuracy = 76.92%'
+# Overall accuracy
+preabx_accuracy <- paste('Accuracy = ',as.character((100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))),'%',sep='')
+# Class-error of interest
+#preabx_accuracy <- 'Accuracy = 25%'
 print(cleared_preabx_rf)
+print(preabx_accuracy)
 
 # Retreive importance and overall error rate
 preabx_importances <- importance(cleared_preabx_rf, type=1)
@@ -110,7 +111,7 @@ temp$Colonization_stat630 <- NULL
 pruned_rf <- randomForest(test~., data=temp, importance=TRUE, replace=FALSE, 
                                   do.trace=FALSE, err.rate=TRUE, ntree=trees, mtry=tries)
 rm(temp, test, trees, tries)
-pruned_accuracy <- paste('Accuracy = ',as.character( (100-round((tail(pruned_rf$err.rate[,1], n=1)*100), 2))),'%',sep='')
+pruned_accuracy <- paste('Accuracy = ',as.character((100-round((tail(pruned_rf$err.rate[,1], n=1)*100), 2))),'%',sep='')
 print(pruned_rf)
 print(pruned_accuracy)
 
@@ -174,6 +175,7 @@ colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
 #--------------------------------------------------------------------#
 
 # Set up plotting environment
+pdf(file='~/Desktop/test.pdf', width=11, height=6)
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
 #---------------------#
@@ -225,6 +227,7 @@ italic_p <- lapply(1:length(preabx_importances$pvalues), function(x) bquote(past
 axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
 mtext('B', side=2, line=2, las=2, adj=13, padj=-17, cex=1.7)
 
+dev.off()
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
 

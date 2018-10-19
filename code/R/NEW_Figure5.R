@@ -15,8 +15,8 @@ for (dep in deps){
 rm(dep)
 
 # Define data files
-setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
-#setwd("~/Desktop/Repositories/clearance_2017/data")
+#setwd("~/Desktop/AdaptiveImmunity_and_Clearance/data")
+setwd("~/Desktop/repos/clearance_2017/data")
 metadata <- 'Adaptiveimmuneclear_metadata_noD40.42.tsv'
 shared <- 'Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.shared'
 taxonomy <- 'clearance.formatted.taxonomy'
@@ -65,7 +65,8 @@ rm(cleared_colonized)
 rm(shared)
 
 # Subset to most informative OTUs from previous RF analysis
-pruned_shared <- cleared_colonized_preabx[, c('Colonization_stat630','Otu0052', 'Otu0093', 'Otu0026')]
+#pruned_shared <- cleared_colonized_preabx[, c('Colonization_stat630','Otu0052', 'Otu0093', 'Otu0026')]
+pruned_shared <- cleared_colonized_preabx[, c('Colonization_stat630','Otu0052', 'Otu0093')]
 
 #--------------------------------------------------------------------#
 
@@ -90,6 +91,7 @@ rm(temp, test, trees, tries)
 preabx_accuracy <- paste('Accuracy = ',as.character( (100-round((tail(cleared_preabx_rf$err.rate[,1], n=1)*100), 2))),'%',sep='')
 #preabx_accuracy <- 'Accuracy = 76.92%'
 print(cleared_preabx_rf)
+print(preabx_accuracy)
 
 # Retreive importance and overall error rate
 preabx_importances <- importance(cleared_preabx_rf, type=1)
@@ -173,6 +175,9 @@ colonized_preabx_shared <- log10(colonized_preabx_shared + 1)
 
 #--------------------------------------------------------------------#
 
+tiff(filename='~/Desktop/test.tiff', width=600, height= 400)
+
+
 # Set up plotting environment
 layout(matrix(c(1,2,2), nrow=1, ncol=3, byrow=TRUE))
 
@@ -224,6 +229,44 @@ axis(2, at=seq(1,index-2,2), labels=do.call(expression, formatted_taxa), las=1, 
 italic_p <- lapply(1:length(preabx_importances$pvalues), function(x) bquote(paste(italic('p'), .(preabx_importances$pvalues[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.6, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, cex.axis=1.2, font=3) 
 mtext('B', side=2, line=2, las=2, adj=13, padj=-17, cex=1.7)
+
+dev.off()
+
+
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+# Plots abundances of top 2 OTUS
+
+abund <- c(log10(pruned_shared$Otu0052 + 1), log10(pruned_shared$Otu0093 + 1))
+colz <- c(pruned_shared$Colonization_stat630, pruned_shared$Colonization_stat630)
+# cleared = 1
+# colonized = 2
+otu <- c(rep(1, nrow(pruned_shared)),rep(2, nrow(pruned_shared)))
+# Otu0052 = 1
+# Otu0093 = 2
+pruned <- cbind(otu, colz, abund)
+
+
+
+
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/Final_OTUs.pdf', width=6, height=4)
+par(mar=c(3,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.75,0), las=1)
+boxplot(abund~colz*otu, data=pruned, at=c(1.25,2.05,3.25,4.05),
+        col=c('white','gray'), outline=FALSE, ylim=c(0,3),
+        boxlwd=2, staplewex=0, whisklwd=2, lty=1, ylab='Relative Abundance (Log10)')
+legend('topleft', legend=c('Cleared','Colonized'), pt.bg=c('white','gray'), 
+       pch=22, cex=1.2, pt.cex=2, box.col='white')
+segments(x0=c(1.25,3.25), y0=c(2,2.8),
+      x1=c(2.05,4.05), y1=c(2,2.8),
+      lwd=1.5)
+text(x=c(1.65,3.65), y=c(2.15,2.95), c('*','*'), font=2, cex=2)
+mtext(c('OTU 52','OTU 93'), side=1, at=c(1.6,3.6), padj=0.5, cex=1.4)
+mtext(c('(MDA: 0.097)','(MDA: 0.175)'), side=1, at=c(1.6,3.6), padj=2.5, cex=0.9)
+box(lwd=3, col='gray')
+dev.off()
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------#
