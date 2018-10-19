@@ -252,12 +252,14 @@ pruned <- cbind(otu, colz, abund)
 
 
 pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/Final_OTUs.pdf', width=6, height=4)
-par(mar=c(3,3,1,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.75,0), las=1)
+par(mar=c(3,3,1.5,1), xaxs='i', xaxt='n', xpd=FALSE, mgp=c(2,0.75,0), las=1)
 boxplot(abund~colz*otu, data=pruned, at=c(1.25,2.05,3.25,4.05),
         col=c('white','gray'), outline=FALSE, ylim=c(0,3),
         boxlwd=2, staplewex=0, whisklwd=2, lty=1, ylab='Relative Abundance (Log10)')
 legend('topleft', legend=c('Cleared','Colonized'), pt.bg=c('white','gray'), 
        pch=22, cex=1.2, pt.cex=2, box.col='white')
+mtext(side=3, 'Lachnospiraceae', font=3, cex=1.2, padj=-0.25, adj=0.35)
+mtext(side=3, 'unclassified', cex=1.2, padj=-0.25, adj=0.68)
 segments(x0=c(1.25,3.25), y0=c(2,2.8),
       x1=c(2.05,4.05), y1=c(2,2.8),
       lwd=1.5)
