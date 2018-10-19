@@ -162,8 +162,6 @@ grid.draw(g1)
 
 
 
-
-
 #Supp figure 2: Colonization of other mice included in Random Forest 
 
 #Colonization WT 2013 Experiment
@@ -220,11 +218,13 @@ SB2 = SB1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linety
 SB3 = SB2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 SB3
 
+#Supp Figure 3: Random Forest Model Using Whole Pre-treatment Community 
+#please see file NEW_Figure5.R for code for this figure 
 
 
 
-#Supp Figure 3: Relative Abundace of OTU 3(Akkermansia)
 
+#Supp Figure 4: Relative Abundace of OTU 3(Akkermansia)
 
 shared<-read.delim(file="Adaptiveimmuneclear_noD40.42.0.03.subsample.0.03.filter.0.03.pick.shared")
 shared$label=NULL
