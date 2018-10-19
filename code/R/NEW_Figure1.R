@@ -52,6 +52,7 @@ Dneg15.cent.nmds<-Dneg15_nmds_meta
 RAG<- Dneg15.cent.nmds[Dneg15.cent.nmds$Genotype=="RAG1KO", 1:2]
 Dneg15nmdsgeno_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$MDS2)~ Dneg15.cent.nmds$Genotype, data=Dneg15.cent.nmds, mean)
 #Plotting the values 
+postscript("~/Desktop/Fig1A.ps", width=8,height=8)
 plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
      xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
@@ -66,6 +67,7 @@ points(0.31,0.23, pch=21, bg='black', cex=2)
 text(0.31, 0.26, labels = c("RAG1KO"), pos=2)
 text(0.31, 0.23, labels = c("WT"), pos=2)
 text(0.31,-0.16, labels = c("p = 0.087"), pos=2)
+dev.off()
 #Stats
 anosim_pvalue <- c()
 for (i in 1:100){
@@ -131,7 +133,7 @@ cfutime_data.infected.med<-summaryMED(cfutime_data.infected, measurevar="CFU_g",
 cfutime_data.infected.med$Genotype<-c(rep("RAG",16), rep("WT",16))
 #add genotype column 
 
-
+postscript("~/Desktop/Fig1B.ps", width=,height=6)
 col=c("16"="#61bfee", "978"="#61bfee","18"="#bb5fa1","977" ="#bb5fa1")
 shape_A=as.numeric(c("RAG"="1", "WT" = "19"))
 plot4.b<-ggplot(cfutime_data.infected.med, aes(x=Day, y= CFU_g, group=Cage, color=factor(Cage), shape=Genotype))+  
@@ -163,6 +165,7 @@ b1 = b+ labs(y = " CFU per Gram Feces")
 b2 = b1+ geom_hline(aes(yintercept=100), colour = "gray10", size = 0.9, linetype=2)
 b3 = b2 + scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),labels = scales::trans_format("log10", scales::math_format(10^.x)))
 b3
+dev.off()
 
 cfutime_data.infected$CFU_g<-replace(cfutime_data.infected$CFU_g,cfutime_data.infected$CFU_g==100,fill.in.lod)
 #replace placed holder LOD values with LOD/squareroot(2) 
@@ -214,6 +217,7 @@ A<- Dneg15.cent.nmds[Dneg15.cent.nmds$Cage=="A", 1:2]
 Dneg15nmds_centroids <- aggregate(cbind(Dneg15.cent.nmds$MDS1, Dneg15.cent.nmds$MDS2)~ Dneg15.cent.nmds$Cage, data=Dneg15.cent.nmds, mean)
 
 #Plotting the values 
+postscript("~/Desktop/Fig1C.ps", width=8,height=8)
 plot(Dneg15_nmds_meta$MDS1, Dneg15_nmds_meta$MDS2, type = "n",xaxt='n', yaxt='n', cex=0.5, las=1,
      xlab ="MDS axis 1", ylab ="MDS axis 2", xlim = c(-0.27,0.32), ylim=c(-0.25,0.29))
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
@@ -228,6 +232,7 @@ points(0.31,0.23, pch=21, bg='#bb5fa1', cex=2)
 text(0.31, 0.26, labels = c("Group A"), pos=2)
 text(0.31, 0.23, labels = c("Group B"), pos=2)
 text(0.31,-0.26, labels = c("p = 0.047"), pos=2)
+dev.off()
 #for the ANOSIM you need to assign samples to either group A (cage 16 and 978) or B (18 and 977) 
 coho.shared$Cage<-sapply(strsplit(row.names(coho.shared), ".D"), "[", 1)
 coho.shared$Cage<-c(rep("A",4), rep("B",8), rep("A",5))
