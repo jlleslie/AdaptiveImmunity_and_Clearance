@@ -275,8 +275,8 @@ row.names(D21.shared) = D21.shared$Group
 D21.shared$label <- NULL
 D21.shared$Group <- NULL
 D21.shared$numOtus <- NULL
-#D21.shared.log<- log10(D21.shared + 1) #calcs Log10 transformed shared 
-D21.shared.log<- (D21.shared / rowSums(D21.shared)) * 100 # percentages
+D21.shared.log<- log10(D21.shared + 1) #calcs Log10 transformed shared 
+#D21.shared.log<- (D21.shared / rowSums(D21.shared)) * 100 # percentages
 
 lefse.D21.shared.log<-D21.shared.log[ ,as.vector(lefse.otus$OTU)]
 #filters shared file down to top 10 OTUs with highest LDA values
@@ -372,21 +372,39 @@ for (index in 1:length(pval.all)) {
   }
 }
 
+# Subset to data to cages
+lefse.neg.tax.lda.c145 <- lefse.neg.tax.lda[c("1451D21","1452D21","1453D21","1454D21"),]
+lefse.neg.tax.lda.c150 <- lefse.neg.tax.lda[c("1501D21","1502D21"),]
+lefse.pos.tax.lda.c143 <- lefse.pos.tax.lda[c("1431D21","1432D21","1434D21"),]
+lefse.pos.tax.lda.c144 <- lefse.pos.tax.lda[c("1441D21","1442D21","1443D21"),]
+lefse.pos.tax.lda.c146 <- lefse.pos.tax.lda[c("1461D21","1462D21"),]
+lefse.pos.tax.lda.c147 <- lefse.pos.tax.lda[c("1471D21","1472D21"),]
+lefse.pos.tax.lda.c150 <- lefse.pos.tax.lda[c("1503D21","1504D21","1505D21"),]
 
 #Plotting
 #plotting relative abundaces on log scale 
-pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=4)
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C_test.pdf', width=6, height=6)
 
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
-plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,100), 
-     ylab='', xlab='Relative Abundance (%)', yaxt='n', cex.lab=1.2)
+plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,4), 
+     ylab='', xlab='Relative Abundance', xaxt='n', yaxt='n', cex.lab=1.2)
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
 index <- 1
 for(i in colnames(lefse.neg.tax.lda)){
-  stripchart(at=index+0.35, lefse.neg.tax.lda[,i], 
-             pch=21, bg='grey', method='jitter', jitter=0.15, cex=1.4, lwd=0.5, add=TRUE)
-  stripchart(at=index-0.35, lefse.pos.tax.lda[,i], 
-             pch=21, bg='grey20', method='jitter', jitter=0.15, cex=1.4, lwd=0.5, add=TRUE)
+  # Negative cages
+  stripchart(at=index+0.35, lefse.neg.tax.lda.c145[,i], 
+             pch=18, col='#3797a5', method='jitter', jitter=0.15, cex=1.4, lwd=1.2, add=TRUE)
+  stripchart(at=index+0.35, lefse.neg.tax.lda.c150[,i], 
+             pch=8, col='#3797a5', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+  # Positive cages
+  stripchart(at=index-0.35, lefse.pos.tax.lda.c143[,i], 
+             pch=15, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+  stripchart(at=index-0.35, lefse.pos.tax.lda.c144[,i], 
+             pch=7, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+  stripchart(at=index-0.35, lefse.pos.tax.lda.c146[,i], 
+             pch=17, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+  stripchart(at=index-0.35, lefse.pos.tax.lda.c147[,i], 
+             pch=25, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   if (i != colnames(lefse.neg.tax.lda)[length(colnames(lefse.neg.tax.lda))]){
     abline(h=index+1, lty=2)
   }
@@ -395,15 +413,15 @@ for(i in colnames(lefse.neg.tax.lda)){
   index <- index + 2
 }
 
-axis(side=1, at=c(0:4), label=c('0','0.01','1','10',"100"), cex.axis=1.2, tck=-0.02, col="grey50", col.ticks ="grey50")
-minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98)
-axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50")
-axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", col.ticks ="grey50")
+axis(1, at=c(0:4), labels=c(1,10,100,1000,10000), las=1, cex.axis=0.8, col="grey80", col.ticks = "grey60")
+minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98) 
+axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
+axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
+axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
+axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", col.ticks ="grey50") 
 
 legend('bottomright', legend=c('Vehicle', 'IgG Positive'),
-       pch=c(21, 21), pt.bg=c('grey','grey20'), bg='white', pt.cex=1.4, cex=0.5)
+       pch=21, pt.bg=c('#3797a5','#a55637'), bg='white', pt.cex=1.4, cex=0.75)
 axis(2, at=seq(1,index-2,2)+0.5, labels=colnames(lefse.neg.tax.lda), las=1, line=-0.5, tick=F, cex.axis=1,col="grey80", col.ticks = "grey60")
 italic_p <- lapply(1:length(pval.all), function(x) bquote(paste(italic('p'), .(pval.all[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.5, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, font=3,cex.axis=0.8) 
