@@ -383,7 +383,7 @@ lefse.pos.tax.lda.c150 <- lefse.pos.tax.lda[c("1503D21","1504D21","1505D21"),]
 
 #Plotting
 #plotting relative abundaces on log scale 
-pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C_test.pdf', width=6, height=6)
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=6)
 
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
 plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,4), 
@@ -413,9 +413,9 @@ for(i in colnames(lefse.neg.tax.lda)){
   index <- index + 2
 }
 
-axis(1, at=c(0:4), labels=c(1,10,100,1000,10000), las=1, cex.axis=0.8, col="grey80", col.ticks = "grey60")
+axis(1, at=c(0:4), labels=c(0,10,100,1000,10000), las=1, cex.axis=0.8, col="grey80", col.ticks = "grey60")
 minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98) 
-axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
+#axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", col.ticks ="grey50") 
