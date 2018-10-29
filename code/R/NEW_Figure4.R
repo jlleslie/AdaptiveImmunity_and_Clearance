@@ -394,6 +394,10 @@ lefse.pos.tax.lda.c146 <- lefse.pos.tax.lda[c("1461D21","1462D21"),]
 lefse.pos.tax.lda.c147 <- lefse.pos.tax.lda[c("1471D21","1472D21"),]
 lefse.pos.tax.lda.c150 <- lefse.pos.tax.lda[c("1503D21","1504D21","1505D21"),]
 
+# Reformat genera names to italics
+lefsa_names <- as.list(colnames(lefse.neg.tax.lda))
+lefsa_names[[10]] <- bquote(paste(italic(.('Akkermansia')), .('(OTU  3)'), sep=' '))
+
 #Plotting
 #plotting relative abundaces on log scale 
 pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=6)
@@ -437,7 +441,8 @@ axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", 
 
 legend('bottomright', legend=c('Vehicle', 'IgG Positive'),
        pch=21, pt.bg=c('#3797a5','#a55637'), bg='white', pt.cex=1.4, cex=0.75)
-axis(2, at=seq(1,index-2,2)+0.5, labels=colnames(lefse.neg.tax.lda), las=1, line=-0.5, tick=F, cex.axis=1,col="grey80", col.ticks = "grey60")
+
+axis(2, at=seq(1,index-2,2)+0.5, labels=do.call(expression, lefsa_names), las=1, line=-0.5, tick=F, cex.axis=1,col="grey80", col.ticks = "grey60")
 italic_p <- lapply(1:length(pval.all), function(x) bquote(paste(italic('p'), .(pval.all[x]), sep=' ')))
 axis(2, at=seq(1,index-2,2)-0.5, labels=do.call(expression, italic_p), las=1, line=-0.5, tick=F, font=3,cex.axis=0.8) 
 
