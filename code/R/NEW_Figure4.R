@@ -275,8 +275,21 @@ row.names(D21.shared) = D21.shared$Group
 D21.shared$label <- NULL
 D21.shared$Group <- NULL
 D21.shared$numOtus <- NULL
+
+# Function to subsample shared files
+rarefyOTU <- function(shared, subSize) {
+  shared <- t(shared)
+  for (x in 1:ncol(shared)) {
+    shared[,x] <- as.vector(rrarefy(shared[,x], sample=subSize))
+  }
+  shared <- as.data.frame(t(shared))
+  return(shared)
+}
+
+#D21.shared.sub <- rarefyOTU(D21.shared, 5000)
+#D21.shared.log<- log10(D21.shared.sub + 1)
 D21.shared.log<- log10(D21.shared + 1) #calcs Log10 transformed shared 
-#D21.shared.log<- (D21.shared / rowSums(D21.shared)) * 100 # percentages
+##D21.shared.log<- (D21.shared / rowSums(D21.shared)) * 100 # percentages
 
 lefse.D21.shared.log<-D21.shared.log[ ,as.vector(lefse.otus$OTU)]
 #filters shared file down to top 10 OTUs with highest LDA values
@@ -387,7 +400,7 @@ pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf',
 
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
 plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,4), 
-     ylab='', xlab='Relative Abundance', xaxt='n', yaxt='n', cex.lab=1.2)
+     ylab='', xlab='Number of Reads (per 10000)', xaxt='n', yaxt='n', cex.lab=0.9)
 box(which = "plot", lty = "solid", col ="grey80", lwd=5)
 index <- 1
 for(i in colnames(lefse.neg.tax.lda)){
