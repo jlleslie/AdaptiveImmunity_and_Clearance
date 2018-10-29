@@ -419,7 +419,7 @@ for(i in colnames(lefse.neg.tax.lda)){
   stripchart(at=index-0.35, lefse.pos.tax.lda.c147[,i], 
              pch=25, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c150[,i], 
-             pch=16, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+             pch=19, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1, lwd=1.2, add=TRUE)
   if (i != colnames(lefse.neg.tax.lda)[length(colnames(lefse.neg.tax.lda))]){
     abline(h=index+1, lty=2)
   }
