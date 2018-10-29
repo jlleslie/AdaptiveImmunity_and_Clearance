@@ -418,6 +418,8 @@ for(i in colnames(lefse.neg.tax.lda)){
              pch=17, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c147[,i], 
              pch=25, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+  stripchart(at=index-0.35, lefse.pos.tax.lda.c150[,i], 
+             pch=16, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   if (i != colnames(lefse.neg.tax.lda)[length(colnames(lefse.neg.tax.lda))]){
     abline(h=index+1, lty=2)
   }
@@ -428,7 +430,7 @@ for(i in colnames(lefse.neg.tax.lda)){
 
 axis(1, at=c(0:4), labels=c(0,10,100,1000,10000), las=1, cex.axis=0.8, col="grey80", col.ticks = "grey60")
 minors <- c(0.1,0.28,0.44,0.58,0.7,0.8,0.88,0.94,0.98) 
-#axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
+axis(side=1, at=minors, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+1, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+2, label=rep('',length(minors)), tck=-0.01, col="grey50", col.ticks ="grey50") 
 axis(side=1, at=minors+3, label=rep('',length(minors)), tck=-0.01,col="grey50", col.ticks ="grey50") 
