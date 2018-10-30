@@ -400,7 +400,7 @@ lefsa_names[[10]] <- bquote(paste(italic(.('Akkermansia')), .('(OTU  3)'), sep='
 
 #Plotting
 #plotting relative abundaces on log scale 
-pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=6)
+pdf(file='~/Desktop/repos/AdaptiveImmunity_and_Clearance/figures/figure_4C.pdf', width=6, height=6, useDingbats=FALSE)
 
 par(mar=c(3,17,1,1), xaxs='r', mgp=c(2,1,0))
 plot(1, type='n', ylim=c(0.8, (ncol(lefse.neg.tax.lda)*2)-0.8), xlim=c(0,4), 
@@ -415,13 +415,13 @@ for(i in colnames(lefse.neg.tax.lda)){
              pch=8, col='#3797a5', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   # Positive cages
   stripchart(at=index-0.35, lefse.pos.tax.lda.c143[,i], 
-             pch=15, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+             pch=9, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c144[,i], 
-             pch=7, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+             pch=13, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c146[,i], 
              pch=17, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c147[,i], 
-             pch=25, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
+             pch=15, col='#a55637', method='jitter', jitter=0.15, cex=1.2, lwd=1.2, add=TRUE)
   stripchart(at=index-0.35, lefse.pos.tax.lda.c150[,i], 
              pch=19, col='#a55637', bg='#a55637', method='jitter', jitter=0.15, cex=1, lwd=1.2, add=TRUE)
   if (i != colnames(lefse.neg.tax.lda)[length(colnames(lefse.neg.tax.lda))]){
