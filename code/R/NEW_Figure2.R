@@ -58,7 +58,7 @@ mock_splenocytes.igg.med<- median(IgG[IgG$Treatment_2=="mock_splenocytes",11])
 vehicle.igg.med<- median(IgG[IgG$Treatment_2=="vehicle",11]) 
 
 #Make a jitter plot of the data 
-postscript("~/Desktop/Fig2A.ps", width=8,height=8)
+#postscript("~/Desktop/Fig2A.ps", width=8,height=8)
 igg.plot<-ggplot(IgG, aes(x=Treatment_2, y=Total_IgG, color=factor(Treatment_2), fill=factor(Treatment_2),shape=factor(Cage)))+ 
   scale_shape_manual(values= shape_cage)+
   geom_jitter(width = 0.4, height = 0.01, size= 5)+
@@ -102,10 +102,10 @@ fig2A = fig2A + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=82
   annotation_custom(gtext.ns, xmin=2.5, xmax=2.5, ymin=9200, ymax=9300) + #adding ns for comparsion between splenocytes- uninfect vs splenocytes- infect
   annotate("segment", x = 2, xend =3, y = 8925, yend = 8950, colour = "black", size = 0.7)+
   annotate("segment", x=0.8, xend=1.4, y=vehicle.igg.med, yend=vehicle.igg.med, color="grey50", size=1) +
-  annotate("segment", x=1.8, xend=2.4, y=infected_splenocytes.igg.med, yend=infected_splenocytes.igg.med, color="grey50", size=1) +
-  annotate("segment", x=2.8, xend=3.4, y=mock_splenocytes.igg.med, yend=mock_splenocytes.igg.med, color="grey50", size=1)+ 
+  annotate("segment", x=1.8, xend=2.4, y=mock_splenocytes.igg.med, yend=infected_splenocytes.igg.med, color="grey50", size=1) +
+  annotate("segment", x=2.8, xend=3.4, y=infected_splenocytes.igg.med, yend=infected_splenocytes.igg.med, color="grey50", size=1)+ 
   #the three segments above draw in median lines for each group 
-   annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-2400, ymax=-2000) +
+  annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=-2400, ymax=-2000) +
   annotation_custom(gtext.splenmock, xmin=2, xmax=2, ymin=-2400, ymax=-2000) +
   annotation_custom(gtext.vhe, xmin=1, xmax=1, ymin=-2400, ymax=-2000)+
   annotation_custom(gtext.1, xmin =0.06, xmax= 0.08, ymin = 1.56, ymax=3) +
@@ -114,7 +114,7 @@ fig2A = fig2A + annotation_custom(gtext.star, xmin=2, xmax=2, ymin=8150, ymax=82
 g3 = ggplotGrob(fig2A)
 g3$layout$clip[g3$layout$name=="panel"] <- "off"
 grid.draw(g3)
-dev.off()
+#dev.off()
 
 ############Figure 2B
 ### Recipient Mice Data Anti-Toxin A IgG Titers 
@@ -162,7 +162,7 @@ recipient$Treatment_2<-factor(recipient$Treatment_2, levels = c("vehicle", "mock
 #assign colors to different treatment groups
 colors.recip<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3")
 #plot 
-postscript("~/Desktop/Fig2B.ps", width=8,height=8)
+#postscript("~/Desktop/Fig2B.ps", width=8,height=8)
 recipient.antitoxin.plot <-ggplot(recipient, aes(x=Treatment_2, y=AntitoxinA_IgG_Titer,  fill= factor(Treatment_2), colour= factor(Treatment_2)))+ 
   geom_dotplot(binaxis = "y", stackdir="center", dotsize = 1.3) +
   scale_color_manual(values = rep("black",3)) +
@@ -214,7 +214,7 @@ fig2B = fig2B + annotation_custom(gtext.2star, xmin=2, xmax=2, ymin=4225, ymax=4
 g2 = ggplotGrob(fig2B)
 g2$layout$clip[g2$layout$name=="panel"] <- "off"
 grid.draw(g2)
-dev.off()
+#dev.off()
 
 #Figure 2C
 #Colonization levels over time 
@@ -264,7 +264,7 @@ cfu.cage<-summaryMED(colonization.noD1, measurevar="CFU_g", metadata=c("Cage","D
 group.cols<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehicle"="#0095a3",
               "143"="#f91780", "146"="#f91780" , "150"="#f91780", "144"= "#db9204", "147" ="#db9204", "145"="#006670", "150A"= "#006670")
 #Plot data
-postscript("~/Desktop/Fig2C.ps", width=8,height=8)
+#postscript("~/Desktop/Fig2C.ps", width=8,height=8)
 cfu.plot<-ggplot(cfu.treat, aes(x=Day, y=CFU_g, color=factor(Treatment_2)))+ 
   geom_line(size=2.5)+
   geom_line(data=cfu.cage, aes(x=Day, y=CFU_g, color=factor(Cage)), size= 0.55,linetype = 2) +
@@ -307,7 +307,7 @@ fig2C.3  = fig2C.3 +
 g3 = ggplotGrob(fig2C.3)
 g3$layout$clip[g3$layout$name=="panel"] <- "off"
 grid.draw(g3)
-dev.off()
+#dev.off()
 
 ###Figure 2d
 ## Colonication at the end of the experiment 
@@ -345,7 +345,7 @@ colors<-c("infected_splenocytes"="#f91780", "mock_splenocytes"= "#fa8c17", "vehi
 #order the dataset so that it will plot vehicle first on the left
 colonization.D26$Treatment_2<-factor(colonization.D26$Treatment_2, levels = c("vehicle", "mock_splenocytes", "infected_splenocytes"))
 shape_cage<-c("143"= 21, "144"=22, "145" =23, "146"=24, "147" =13, "150" =9 , "150A" =8)
-postscript("~/Desktop/Fig2D.ps", width=8,height=8)
+#postscript("~/Desktop/Fig2D.ps", width=8,height=8)
 d26.plot<-ggplot(colonization.D26, aes(x=Treatment_2, y=CFU_g, color=factor(Treatment_2), fill=factor(Treatment_2), shape=factor(Cage)))+ 
   #stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.4, color="grey50") +
   scale_shape_manual(values= shape_cage)+
@@ -386,16 +386,16 @@ fig2D  = fig2D  + annotation_custom(gtext.ns, xmin=2, xmax=2, ymin = 8.1, ymax= 
   annotate("segment", x = 2, xend = 3, y = 200000000, yend = 200000000, colour = "black", size = 0.7) +
   annotation_custom(gtext.ns, xmin=1.5, xmax=1.5, ymin=8.6, ymax=8.8) +
   annotate("segment", x = 1, xend = 2, y =300000000, yend = 300000000, colour = "black", size = 0.7)+
-  annotate("segment", x=0.8, xend=1.2, y=vehicle.cfu.med, yend=vehicle.cfu.med, color="grey50", size=1) +
-  annotate("segment", x=1.8, xend=2.2, y=infected_splenocytes.cfu.med, yend=infected_splenocytes.cfu.med, color="grey50", size=1) +
-  annotate("segment", x=2.8, xend=3.2, y=mock_splenocytes.cfu.med, yend=mock_splenocytes.cfu.med, color="grey50", size=1)+ 
+  annotate("segment", x=0.8, xend=1.2, y=log10_trans(vehicle.cfu.med), yend=log10_trans(vehicle.cfu.med), color="grey50", size=1) +
+  annotate("segment", x=1.8, xend=2.2, y=log10_trans(infected_splenocytes.cfu.med), yend=log10_trans(infected_splenocytes.cfu.med), color="grey50", size=1) +
+  annotate("segment", x=2.8, xend=3.2, y=log10_trans(mock_splenocytes.cfu.med), yend=log10_trans(mock_splenocytes.cfu.med), color="grey50", size=1)+ 
   annotation_custom(gtext.spleninfect, xmin=3, xmax=3,  ymin=0, ymax=0) +
   annotation_custom(gtext.splenmock, xmin=2, xmax=2,  ymin=0, ymax=0) +
   annotation_custom(gtext.vhe, xmin=1, xmax=1, ymin=0, ymax=0)
 g = ggplotGrob(fig2D)
 g$layout$clip[g$layout$name=="panel"] <- "off"
 grid.draw(g)
-dev.off()
+#dev.off()
 
 
 
