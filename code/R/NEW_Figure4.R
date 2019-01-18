@@ -397,14 +397,14 @@ lefse.pos.tax.lda.c150 <- lefse.pos.tax.lda[c("1503D21","1504D21","1505D21"),]
 # Reformat genera names to italics
 lefsa_names <- as.list(colnames(lefse.neg.tax.lda))
 lefsa_names[[10]] <- bquote(paste(italic(.('Akkermansia')), .('(OTU 3)'), sep=' '))
-lefsa_names[[9]] <- bquote(paste(italic(.('Lachnospiraceae')), .('unclassified (OTU 100)'), sep=' '))
-lefsa_names[[7]] <- bquote(paste(italic(.('Lachnospiraceae')), .('unclassified (OTU 20)'), sep=' '))
+lefsa_names[[9]] <- bquote(paste(italic(.('Lachnospiraceae')), .(' unclassified (OTU 100)'), sep=' '))
+lefsa_names[[7]] <- bquote(paste(italic(.('Lachnospiraceae')), .(' unclassified (OTU 20)'), sep=' '))
 lefsa_names[[6]] <- bquote(paste(italic(.('Turicibacter')), .('(OTU 2)'), sep=' '))
-lefsa_names[[5]] <- bquote(paste(italic(.('Clostridiales')), .('unclassified (OTU 167)'), sep=' '))
-lefsa_names[[4]] <- bquote(paste(italic(.('Lachnospiraceae')), .('unclassified (OTU 41)'), sep=' '))
-lefsa_names[[3]] <- bquote(paste(italic(.('Lachnospiraceae')), .('unclassified (OTU 166)'), sep=' '))
-lefsa_names[[2]] <- bquote(paste(italic(.('Ruminococcaceae')), .('unclassified (OTU 106)'), sep=' '))
-lefsa_names[[1]] <- bquote(paste(italic(.('Enterobacteriaceae')), .('unclassified (OTU 134)'), sep=' '))
+lefsa_names[[5]] <- bquote(paste(italic(.('Clostridiales')), .(' unclassified (OTU 167)'), sep=' '))
+lefsa_names[[4]] <- bquote(paste(italic(.('Lachnospiraceae')), .(' unclassified (OTU 41)'), sep=' '))
+lefsa_names[[3]] <- bquote(paste(italic(.('Lachnospiraceae')), .(' unclassified (OTU 166)'), sep=' '))
+lefsa_names[[2]] <- bquote(paste(italic(.('Ruminococcaceae')), .(' unclassified (OTU 106)'), sep=' '))
+lefsa_names[[1]] <- bquote(paste(italic(.('Enterobacteriaceae')), .(' unclassified (OTU 134)'), sep=' '))
 
 #Plotting
 #plotting relative abundaces on log scale 
